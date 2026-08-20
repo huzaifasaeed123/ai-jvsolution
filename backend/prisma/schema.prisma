@@ -1,0 +1,60 @@
+// Prisma schema — JV Solution
+// Datasource URL comes from DATABASE_URL env var: local Postgres in dev,
+// server Postgres in production. Change the env var only — never the code.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---- Enums (Phase 1) ----
+
+enum Role {
+  OWNER
+  DEVELOPER
+  INVESTOR
+  GOVERNMENT
+  ADMIN
+}
+
+enum AccessLevel {
+  PUBLIC
+  REGISTERED
+  VERIFIED
+  NDA
+  DUE_DILIGENCE
+  TRANSACTION
+}
+
+// ---- Models (Phase 1 foundation) ----
+// Auth logic (register/login) is built in Step 2; models defined here so the
+// first migration creates the core tables.
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  country   String?
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  fullName     String
+  role         Role
+  accessLevel  AccessLevel @default(REGISTERED)
+  country      String?
+  companyId    String?
+  company      Company?    @relation(fields: [companyId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@index([role])
+}
