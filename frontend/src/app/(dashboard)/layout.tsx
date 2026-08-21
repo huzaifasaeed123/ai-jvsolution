@@ -30,6 +30,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
               My opportunities
             </Link>
           )}
+          {(user.role === 'DEVELOPER' || user.role === 'INVESTOR' || user.role === 'ADMIN') && (
+            <Link
+              href="/dashboard/mandates"
+              className="block rounded-md px-3 py-2 hover:bg-foreground/5"
+            >
+              My mandates
+            </Link>
+          )}
           <Link href="/opportunities" className="block rounded-md px-3 py-2 hover:bg-foreground/5">
             Browse opportunities
           </Link>

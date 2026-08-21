@@ -144,6 +144,22 @@ export class OpportunitiesService {
     return items.map((o) => OpportunitySerializer.toFull(o));
   }
 
+  /**
+   * Raw published candidates for the matching engine (internal cross-service use).
+   * Optionally pre-filtered by country/sector to narrow the set; the Fit Score
+   * still scores each candidate on all factors.
+   */
+  async findMatchCandidates(filter: {
+    countryCodes?: string[];
+    sectors?: string[];
+  }): Promise<OpportunityWithOwner[]> {
+    const or: Prisma.OpportunityWhereInput[] = [];
+    if (filter.countryCodes?.length) or.push({ countryCode: { in: filter.countryCodes } });
+    if (filter.sectors?.length) or.push({ sector: { in: filter.sectors } });
+    const where: Prisma.OpportunityWhereInput = or.length ? { OR: or } : {};
+    return this.repo.findPublishedCandidates(where);
+  }
+
   /** Public detail. Drafts are hidden from non-owners; confidential fields gated. */
   async getOne(id: string, user?: AuthUser) {
     const found = await this.repo.findById(id);

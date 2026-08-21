@@ -45,6 +45,15 @@ export class OpportunitiesRepository {
     return { items, total };
   }
 
+  /** Published, non-deleted candidates for the matching engine (capped). */
+  findPublishedCandidates(where: Prisma.OpportunityWhereInput): Promise<OpportunityWithOwner[]> {
+    return this.prisma.opportunity.findMany({
+      where: { ...where, deletedAt: null, status: 'PUBLISHED' },
+      include: ownerSelect,
+      take: 500,
+    });
+  }
+
   findManyByOwner(ownerId: string): Promise<OpportunityWithOwner[]> {
     return this.prisma.opportunity.findMany({
       where: { ownerId, deletedAt: null },

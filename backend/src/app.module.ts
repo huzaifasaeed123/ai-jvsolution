@@ -8,6 +8,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { OpportunitiesModule } from './modules/opportunities/opportunities.module';
 import { ReferenceModule } from './modules/reference/reference.module';
+import { MandatesModule } from './modules/mandates/mandates.module';
+import { MatchingModule } from './modules/matching/matching.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ReferenceModule } from './modules/reference/reference.module';
     AuthModule,
     ReferenceModule,
     OpportunitiesModule,
+    MatchingModule,
+    MandatesModule,
   ],
 })
 export class AppModule {}

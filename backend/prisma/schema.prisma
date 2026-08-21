@@ -104,6 +104,7 @@ model User {
   companyId    String?
   company      Company?      @relation(fields: [companyId], references: [id])
   opportunities Opportunity[]
+  mandates     Mandate[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -179,4 +180,41 @@ model Opportunity {
   @@index([countryCode])
   @@index([sector])
   @@index([ownerId])
+}
+
+// ============================================================
+// Mandates (developer / investor demand side)
+// What a capital/delivery partner is looking for. Matched against
+// opportunities by the deterministic Fit Score engine.
+// ============================================================
+
+model Mandate {
+  id    String @id @default(cuid())
+  title String
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  // Targeting criteria (validated string codes / enums)
+  sectors         String[]
+  countryCodes    String[]
+  projectTypes    String[]
+  structures      String[]
+  ownerCategories OwnerCategory[]
+
+  // Ticket size (minor units)
+  currency           String  @default("USD")
+  minInvestmentCents BigInt?
+  maxInvestmentCents BigInt?
+
+  targetIrr    Float? // % the partner is targeting
+  riskAppetite RiskLevel?
+
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([ownerId])
+  @@index([active])
 }
