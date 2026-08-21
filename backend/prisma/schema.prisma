@@ -11,7 +11,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ---- Enums (Phase 1) ----
+// ============================================================
+// Enums
+// ============================================================
 
 enum Role {
   OWNER
@@ -30,9 +32,57 @@ enum AccessLevel {
   TRANSACTION
 }
 
-// ---- Models (Phase 1 foundation) ----
-// Auth logic (register/login) is built in Step 2; models defined here so the
-// first migration creates the core tables.
+// Public / semi-government / government owner category (spec §3, §30).
+enum OwnerCategory {
+  PRIVATE
+  SEMI_GOVERNMENT
+  GOVERNMENT
+}
+
+// Opportunity lifecycle (spec §36).
+enum OpportunityStatus {
+  DRAFT
+  PUBLISHED
+  MATCHED
+  IN_DEAL
+  CLOSED
+  ARCHIVED
+}
+
+// Opportunity Passport verification tiers (spec §23).
+enum VerificationTier {
+  T0 // Draft / unverified
+  T1 // Declared information
+  T2 // Documents reviewed
+  T3 // Ownership / authority verified
+  T4 // Professional due diligence verified
+  T5 // Registry / authority linked / independently validated
+}
+
+enum RiskLevel {
+  LOW
+  MODERATE
+  MEDIUM
+  HIGH
+}
+
+enum PermitStatus {
+  NONE
+  PRELIMINARY
+  IN_PROGRESS
+  APPROVED
+}
+
+enum DataRoomReadiness {
+  EMPTY
+  BASIC
+  PARTIAL
+  COMPLETE
+}
+
+// ============================================================
+// Identity & organisation
+// ============================================================
 
 model Company {
   id        String   @id @default(cuid())
@@ -44,17 +94,89 @@ model Company {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  email        String      @unique
+  id           String        @id @default(cuid())
+  email        String        @unique
   passwordHash String
   fullName     String
   role         Role
-  accessLevel  AccessLevel @default(REGISTERED)
+  accessLevel  AccessLevel   @default(REGISTERED)
   country      String?
   companyId    String?
-  company      Company?    @relation(fields: [companyId], references: [id])
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  company      Company?      @relation(fields: [companyId], references: [id])
+  opportunities Opportunity[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@index([role])
+}
+
+// ============================================================
+// Opportunities (core domain)
+// Public fields are safe to list; confidential fields are only serialized
+// to the owner/admin (and, from Step 5, users granted access). See serializer.
+// ============================================================
+
+model Opportunity {
+  id        String @id @default(cuid())
+  reference String @unique // human-friendly, e.g. JV-AE-2026-0007
+
+  // --- Identity (public) ---
+  title         String
+  summary       String? // short public description
+  sector        String // validated against reference SECTORS
+  projectType   String? // validated against reference PROJECT_TYPES
+  ownerCategory OwnerCategory @default(PRIVATE)
+
+  status       OpportunityStatus @default(DRAFT)
+  verification VerificationTier  @default(T0)
+
+  // --- Location ---
+  countryCode String // public
+  region      String? // public
+  city        String? // public
+  addressLine String? // CONFIDENTIAL
+  latitude    Float? // CONFIDENTIAL
+  longitude   Float? // CONFIDENTIAL
+
+  // --- Physical / planning (public) ---
+  landAreaSqm Float?
+  gfaSqm      Float?
+  buaSqm      Float?
+  nsaSqm      Float?
+  plotRatio   Float?
+  landUse     String?
+  heightLimit String?
+
+  // --- Commercial (public, indicative) ---
+  currency              String  @default("USD")
+  projectValueCents     BigInt? // GDV, minor units
+  investmentRequiredCents BigInt?
+  targetIrr             Float? // %
+  developmentPeriodMonths Int?
+  concessionPeriodYears Int?
+
+  // --- Structure & risk ---
+  structures        String[] // validated against reference STRUCTURES
+  riskLevel         RiskLevel?
+  permitStatus      PermitStatus      @default(NONE)
+  dataRoomReadiness DataRoomReadiness @default(EMPTY)
+
+  // --- Partner requirements (public) ---
+  requiredDeveloperExperience String?
+  requiredContractorClass     String?
+  requiredOperatorType        String?
+  financingRequired           Boolean @default(false)
+
+  // --- Ownership (identity CONFIDENTIAL until reveal) ---
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
+
+  @@index([status])
+  @@index([countryCode])
+  @@index([sector])
+  @@index([ownerId])
 }

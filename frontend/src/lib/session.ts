@@ -8,6 +8,10 @@ import type { User } from '@/features/auth/types';
  * Reads the session cookie and resolves the current user via the API.
  * Server-only. Returns null when unauthenticated. Used by protected layouts.
  */
+export async function getAccessToken(): Promise<string | undefined> {
+  return (await cookies()).get(ACCESS_COOKIE)?.value;
+}
+
 export async function getCurrentUser(): Promise<User | null> {
   const token = (await cookies()).get(ACCESS_COOKIE)?.value;
   if (!token) return null;

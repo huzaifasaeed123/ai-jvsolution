@@ -22,6 +22,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Link href="/dashboard" className="block rounded-md px-3 py-2 hover:bg-foreground/5">
             Dashboard
           </Link>
+          {(user.role === 'OWNER' || user.role === 'GOVERNMENT' || user.role === 'ADMIN') && (
+            <Link
+              href="/dashboard/opportunities"
+              className="block rounded-md px-3 py-2 hover:bg-foreground/5"
+            >
+              My opportunities
+            </Link>
+          )}
+          <Link href="/opportunities" className="block rounded-md px-3 py-2 hover:bg-foreground/5">
+            Browse opportunities
+          </Link>
         </nav>
         <div className="mt-8 border-t border-foreground/10 pt-4">
           <p className="text-sm font-medium">{user.fullName}</p>
