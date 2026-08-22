@@ -17,7 +17,6 @@ import { OpportunitiesService } from './opportunities.service';
 import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { QueryOpportunityDto } from './dto/query-opportunity.dto';
-import { SetVerificationDto } from './dto/set-verification.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -79,13 +78,5 @@ export class OpportunitiesController {
   @ApiOperation({ summary: 'Soft-delete an opportunity (owner or admin)' })
   remove(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.service.remove(user, id);
-  }
-
-  @Patch(':id/verification')
-  @Roles(Role.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Set Opportunity Passport verification tier (admin)' })
-  setVerification(@Param('id') id: string, @Body() dto: SetVerificationDto) {
-    return this.service.setVerification(id, dto.tier);
   }
 }

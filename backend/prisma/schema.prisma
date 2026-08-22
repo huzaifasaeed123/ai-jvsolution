@@ -211,6 +211,7 @@ model Opportunity {
   folders           Folder[]
   documents         Document[]
   dueDiligenceItems DueDiligenceItem[]
+  verificationRecord VerificationRecord?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -363,6 +364,22 @@ model DocumentVersion {
 // A per-opportunity checklist. Each item carries receipt, review status, risk
 // rating, finding, mitigation, deadline and closure.
 // ============================================================
+
+// Opportunity Passport verification (spec §23). Tier lives on Opportunity;
+// this record holds the verified fields, unresolved items, reviewer and date.
+model VerificationRecord {
+  id              String      @id @default(cuid())
+  opportunityId   String      @unique
+  opportunity     Opportunity @relation(fields: [opportunityId], references: [id])
+  verifiedFields  String[]
+  unresolvedItems String[]
+  notes           String?
+  reviewerId      String?
+  reviewerName    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
 
 model DueDiligenceItem {
   id               String         @id @default(cuid())

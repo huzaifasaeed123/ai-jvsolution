@@ -14,6 +14,7 @@ import { AccessModule } from './modules/access/access.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { DataroomModule } from './modules/dataroom/dataroom.module';
 import { DueDiligenceModule } from './modules/duediligence/duediligence.module';
+import { VerificationModule } from './modules/verification/verification.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { DueDiligenceModule } from './modules/duediligence/duediligence.module';
     AccessModule,
     DataroomModule,
     DueDiligenceModule,
+    VerificationModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

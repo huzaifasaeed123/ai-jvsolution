@@ -8,6 +8,8 @@ import { getDataRoom } from '@/features/dataroom/api';
 import { DataRoom } from '@/features/dataroom/components/DataRoom';
 import { getDueDiligence, getDueDiligenceReference } from '@/features/duediligence/api';
 import { DueDiligencePanel } from '@/features/duediligence/components/DueDiligencePanel';
+import { getVerification, getVerificationReference } from '@/features/verification/api';
+import { VerificationPanel } from '@/features/verification/components/VerificationPanel';
 import {
   formatMoney,
   formatNumber,
@@ -31,14 +33,17 @@ export default async function OpportunityDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [o, reference, user, dataRoom, dueDiligence, ddReference] = await Promise.all([
-    getOpportunity(id),
-    getOpportunityReference(),
-    getCurrentUser(),
-    getDataRoom(id),
-    getDueDiligence(id),
-    getDueDiligenceReference(),
-  ]);
+  const [o, reference, user, dataRoom, dueDiligence, ddReference, passport, verifyReference] =
+    await Promise.all([
+      getOpportunity(id),
+      getOpportunityReference(),
+      getCurrentUser(),
+      getDataRoom(id),
+      getDueDiligence(id),
+      getDueDiligenceReference(),
+      getVerification(id),
+      getVerificationReference(),
+    ]);
   if (!o) notFound();
 
   // If confidential is still locked and the viewer isn't the owner, load their
@@ -72,6 +77,13 @@ export default async function OpportunityDetailPage({
         {o.countryCode}
       </p>
       {o.summary && <p className="mt-4 max-w-2xl text-foreground/80">{o.summary}</p>}
+
+      {/* Opportunity Passport */}
+      {passport && (
+        <div className="mt-6">
+          <VerificationPanel opportunityId={o.id} data={passport} reference={verifyReference} />
+        </div>
+      )}
 
       {/* Investment */}
       <section className="mt-8">

@@ -12,6 +12,7 @@ export const AuditAction = {
   DOCUMENT_UPLOADED: 'DOCUMENT_UPLOADED',
   DOCUMENT_DOWNLOADED: 'DOCUMENT_DOWNLOADED',
   DOCUMENT_VIEWED: 'DOCUMENT_VIEWED',
+  VERIFICATION_UPDATED: 'VERIFICATION_UPDATED',
 } as const;
 
 export type AuditActionType = (typeof AuditAction)[keyof typeof AuditAction];
