@@ -88,6 +88,32 @@ enum AccessStatus {
   REVOKED
 }
 
+// Due Diligence Centre (spec §11).
+enum RiskRating {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFORMATIONAL
+}
+
+enum ReceiptStatus {
+  NOT_RECEIVED
+  RECEIVED
+  NOT_APPLICABLE
+}
+
+enum DdReviewStatus {
+  PENDING
+  IN_REVIEW
+  REVIEWED
+}
+
+enum ClosureStatus {
+  OPEN
+  CLOSED
+}
+
 // ============================================================
 // Identity & organisation
 // ============================================================
@@ -181,9 +207,10 @@ model Opportunity {
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
 
-  accessRequests AccessRequest[]
-  folders        Folder[]
-  documents      Document[]
+  accessRequests    AccessRequest[]
+  folders           Folder[]
+  documents         Document[]
+  dueDiligenceItems DueDiligenceItem[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -329,4 +356,36 @@ model DocumentVersion {
 
   @@unique([documentId, version])
   @@index([documentId])
+}
+
+// ============================================================
+// Due Diligence Centre (spec §11)
+// A per-opportunity checklist. Each item carries receipt, review status, risk
+// rating, finding, mitigation, deadline and closure.
+// ============================================================
+
+model DueDiligenceItem {
+  id               String         @id @default(cuid())
+  opportunityId    String
+  opportunity      Opportunity    @relation(fields: [opportunityId], references: [id])
+  category         String // e.g. "legal", "financial" from the DD categories list
+  title            String // the required document / item
+  receipt          ReceiptStatus  @default(NOT_RECEIVED)
+  reviewStatus     DdReviewStatus @default(PENDING)
+  riskRating       RiskRating?
+  finding          String?
+  recommendation   String?
+  responsibleParty String?
+  mitigation       String?
+  evidence         String?
+  deadline         DateTime?
+  closure          ClosureStatus  @default(OPEN)
+  reviewerId       String?
+  createdById      String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  @@index([opportunityId])
+  @@index([category])
 }

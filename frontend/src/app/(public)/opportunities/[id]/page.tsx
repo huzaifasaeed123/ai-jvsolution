@@ -6,6 +6,8 @@ import { getMyRequestFor } from '@/features/access/api';
 import { AccessPanel } from '@/features/access/components/AccessPanel';
 import { getDataRoom } from '@/features/dataroom/api';
 import { DataRoom } from '@/features/dataroom/components/DataRoom';
+import { getDueDiligence, getDueDiligenceReference } from '@/features/duediligence/api';
+import { DueDiligencePanel } from '@/features/duediligence/components/DueDiligencePanel';
 import {
   formatMoney,
   formatNumber,
@@ -29,11 +31,13 @@ export default async function OpportunityDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [o, reference, user, dataRoom] = await Promise.all([
+  const [o, reference, user, dataRoom, dueDiligence, ddReference] = await Promise.all([
     getOpportunity(id),
     getOpportunityReference(),
     getCurrentUser(),
     getDataRoom(id),
+    getDueDiligence(id),
+    getDueDiligenceReference(),
   ]);
   if (!o) notFound();
 
@@ -134,6 +138,14 @@ export default async function OpportunityDetailPage({
           ) : (
             <p className="text-sm text-foreground/50">Data room unavailable.</p>
           )}
+        </div>
+      </section>
+
+      {/* Due Diligence */}
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground/50">Due diligence</h2>
+        <div className="mt-3">
+          <DueDiligencePanel opportunityId={o.id} data={dueDiligence} reference={ddReference} />
         </div>
       </section>
     </article>

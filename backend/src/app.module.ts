@@ -13,6 +13,7 @@ import { MatchingModule } from './modules/matching/matching.module';
 import { AccessModule } from './modules/access/access.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { DataroomModule } from './modules/dataroom/dataroom.module';
+import { DueDiligenceModule } from './modules/duediligence/duediligence.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { DataroomModule } from './modules/dataroom/dataroom.module';
     StorageModule,
     AccessModule,
     DataroomModule,
+    DueDiligenceModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
