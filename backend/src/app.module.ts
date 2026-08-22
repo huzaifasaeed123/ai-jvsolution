@@ -10,6 +10,7 @@ import { OpportunitiesModule } from './modules/opportunities/opportunities.modul
 import { ReferenceModule } from './modules/reference/reference.module';
 import { MandatesModule } from './modules/mandates/mandates.module';
 import { MatchingModule } from './modules/matching/matching.module';
+import { AccessModule } from './modules/access/access.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MatchingModule } from './modules/matching/matching.module';
     UsersModule,
     AuthModule,
     ReferenceModule,
+    AccessModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

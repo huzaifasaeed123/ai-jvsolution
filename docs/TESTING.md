@@ -76,7 +76,20 @@ Sign in as a **Developer** or **Investor**.
 5. Try a **narrow** mandate (e.g. only sector `airport`, country `US`) → fewer/lower matches;
    a **broad** one → more/higher. The score should move logically.
 
-### E. Roles & permissions (server-enforced)
+### E. Access → NDA → Reveal (Step 5, completes Area 1)
+This is the "anonymous until approved" loop.
+1. As a **Developer** (e.g. Eve), open a published opportunity you don't own → confidential
+   panel shows **Request access**. Click it (optional note) → status becomes **pending**.
+2. Sign in as the **owner** → sidebar **Access requests** → **Incoming** shows the request →
+   **Approve**.
+3. Back as the **Developer** → sidebar **Access requests** → **My requests** → the approved row
+   shows **Sign NDA & unlock** (or use the panel on the opportunity page).
+4. After signing, open the opportunity → the **exact address, coordinates and owner identity are
+   now revealed**. Every reveal is written to the audit log.
+5. Negative checks: signing the NDA **before** approval is blocked; requesting your **own**
+   opportunity is blocked; another user can't approve/see a request that isn't theirs.
+
+### F. Roles & permissions (server-enforced)
 - A **Landowner** has **My opportunities** in the sidebar; a **Developer/Investor** has
   **My mandates**. (Admins see both.)
 - Via API/Swagger: an owner calling `POST /mandates` → **403**; a developer calling

@@ -38,6 +38,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
               My mandates
             </Link>
           )}
+          <Link
+            href="/dashboard/requests"
+            className="block rounded-md px-3 py-2 hover:bg-foreground/5"
+          >
+            Access requests
+          </Link>
           <Link href="/opportunities" className="block rounded-md px-3 py-2 hover:bg-foreground/5">
             Browse opportunities
           </Link>

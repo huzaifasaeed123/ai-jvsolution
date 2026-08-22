@@ -1,6 +1,9 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getOpportunity, getOpportunityReference } from '@/features/opportunities/api';
+import { getCurrentUser } from '@/lib/session';
+import { getMyRequestFor } from '@/features/access/api';
+import { AccessPanel } from '@/features/access/components/AccessPanel';
 import {
   formatMoney,
   formatNumber,
@@ -24,8 +27,17 @@ export default async function OpportunityDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [o, reference] = await Promise.all([getOpportunity(id), getOpportunityReference()]);
+  const [o, reference, user] = await Promise.all([
+    getOpportunity(id),
+    getOpportunityReference(),
+    getCurrentUser(),
+  ]);
   if (!o) notFound();
+
+  // If confidential is still locked and the viewer isn't the owner, load their
+  // access-request state to drive the request/NDA panel.
+  const isOwner = !!user && !!o.owner && o.owner.id === user.id;
+  const myRequest = o.confidentialLocked && user && !isOwner ? await getMyRequestFor(id) : null;
 
   const sectorLabels = toLabelMap(reference.sectors);
   const structureLabels = toLabelMap(reference.structures);
@@ -98,13 +110,7 @@ export default async function OpportunityDetailPage({
           Location & ownership
         </h2>
         {o.confidentialLocked ? (
-          <div className="mt-3 rounded-lg border border-dashed border-foreground/20 bg-foreground/[0.03] p-5">
-            <p className="text-sm font-medium">🔒 Anonymous until approved</p>
-            <p className="mt-1 text-sm text-foreground/60">
-              Exact location, address and owner identity are revealed after the owner approves your
-              access request and an NDA is in place. (Access flow is added in Step 5.)
-            </p>
-          </div>
+          <AccessPanel opportunityId={o.id} request={myRequest} isLoggedIn={!!user} />
         ) : (
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
             <Field label="Address" value={o.addressLine} />

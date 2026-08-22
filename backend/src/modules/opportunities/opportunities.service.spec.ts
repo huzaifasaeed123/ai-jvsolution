@@ -64,7 +64,13 @@ describe('OpportunitiesService (authorization)', () => {
       update: jest.fn(),
       softDelete: jest.fn(),
     };
-    service = new OpportunitiesService(repo as unknown as OpportunitiesRepository);
+    const access = { hasAccess: jest.fn().mockResolvedValue(false) };
+    const audit = { record: jest.fn().mockResolvedValue(undefined) };
+    service = new OpportunitiesService(
+      repo as unknown as OpportunitiesRepository,
+      access as never,
+      audit as never,
+    );
   });
 
   it('blocks a non-owner from updating an opportunity', async () => {

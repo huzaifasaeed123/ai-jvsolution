@@ -80,6 +80,14 @@ enum DataRoomReadiness {
   COMPLETE
 }
 
+// Access request lifecycle (spec §24 anonymous reveal protocol).
+enum AccessStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REVOKED
+}
+
 // ============================================================
 // Identity & organisation
 // ============================================================
@@ -105,6 +113,7 @@ model User {
   company      Company?      @relation(fields: [companyId], references: [id])
   opportunities Opportunity[]
   mandates     Mandate[]
+  accessRequests AccessRequest[] @relation("AccessRequester")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -172,6 +181,8 @@ model Opportunity {
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
 
+  accessRequests AccessRequest[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // soft delete
@@ -217,4 +228,42 @@ model Mandate {
 
   @@index([ownerId])
   @@index([active])
+}
+
+// ============================================================
+// Access requests, NDA & reveal (spec §24) + audit trail
+// ============================================================
+
+model AccessRequest {
+  id            String       @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity  @relation(fields: [opportunityId], references: [id])
+  requesterId   String
+  requester     User         @relation("AccessRequester", fields: [requesterId], references: [id])
+  ownerId       String // denormalized opportunity owner (fast owner-side queries)
+  status        AccessStatus @default(PENDING)
+  message       String?
+  ndaSignedAt   DateTime? // reveal requires APPROVED + ndaSignedAt
+  decidedAt     DateTime?
+  decidedById   String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([opportunityId, requesterId]) // one request per user per opportunity
+  @@index([ownerId])
+  @@index([requesterId])
+  @@index([opportunityId])
+}
+
+model AuditLog {
+  id            String   @id @default(cuid())
+  actorId       String?
+  action        String // ACCESS_REQUESTED, ACCESS_APPROVED, ACCESS_REJECTED, NDA_SIGNED, CONFIDENTIAL_VIEWED
+  opportunityId String?
+  targetUserId  String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([opportunityId])
+  @@index([actorId])
 }

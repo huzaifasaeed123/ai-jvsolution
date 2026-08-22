@@ -12,6 +12,8 @@ import { CreateOpportunityDto } from './dto/create-opportunity.dto';
 import { UpdateOpportunityDto } from './dto/update-opportunity.dto';
 import { QueryOpportunityDto } from './dto/query-opportunity.dto';
 import { AuthUser } from '../../common/decorators/current-user.decorator';
+import { AccessService } from '../access/access.service';
+import { AuditService, AuditAction } from '../access/audit.service';
 
 function majorToCents(major?: number): bigint | undefined {
   return major === undefined ? undefined : BigInt(Math.round(major * 100));
@@ -19,7 +21,11 @@ function majorToCents(major?: number): bigint | undefined {
 
 @Injectable()
 export class OpportunitiesService {
-  constructor(private readonly repo: OpportunitiesRepository) {}
+  constructor(
+    private readonly repo: OpportunitiesRepository,
+    private readonly access: AccessService,
+    private readonly audit: AuditService,
+  ) {}
 
   // ---- Commands ----
 
@@ -160,15 +166,36 @@ export class OpportunitiesService {
     return this.repo.findPublishedCandidates(where);
   }
 
-  /** Public detail. Drafts are hidden from non-owners; confidential fields gated. */
+  /** Public detail. Drafts are hidden from non-owners; confidential fields are
+   * revealed to the owner/admin, and to a user with an approved + NDA-signed
+   * access grant (spec §24). Grant-based reveals are audited. */
   async getOne(id: string, user?: AuthUser) {
     const found = await this.repo.findById(id);
     if (!found) throw new NotFoundException('Opportunity not found');
 
-    const privileged = this.canSeeConfidential(user, found);
+    let privileged = false;
+    let viaGrant = false;
+    if (user) {
+      if (user.role === 'ADMIN' || found.ownerId === user.id) {
+        privileged = true;
+      } else if (await this.access.hasAccess(user.id, found.id)) {
+        privileged = true;
+        viaGrant = true;
+      }
+    }
+
     if (found.status !== OpportunityStatus.PUBLISHED && !privileged) {
       throw new NotFoundException('Opportunity not found');
     }
+
+    if (viaGrant && user) {
+      await this.audit.record({
+        actorId: user.id,
+        action: AuditAction.CONFIDENTIAL_VIEWED,
+        opportunityId: found.id,
+      });
+    }
+
     return privileged
       ? OpportunitySerializer.toFull(found)
       : OpportunitySerializer.toPublic(found);
@@ -181,11 +208,6 @@ export class OpportunitiesService {
     const gte = q.minInvestment !== undefined ? BigInt(Math.round(q.minInvestment * 100)) : undefined;
     const lte = q.maxInvestment !== undefined ? BigInt(Math.round(q.maxInvestment * 100)) : undefined;
     return { investmentRequiredCents: { ...(gte !== undefined ? { gte } : {}), ...(lte !== undefined ? { lte } : {}) } };
-  }
-
-  private canSeeConfidential(user: AuthUser | undefined, o: OpportunityWithOwner): boolean {
-    if (!user) return false;
-    return user.role === 'ADMIN' || o.ownerId === user.id;
   }
 
   private async getOwnedOr404(user: AuthUser, id: string): Promise<OpportunityWithOwner> {
