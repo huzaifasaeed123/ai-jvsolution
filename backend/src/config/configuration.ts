@@ -13,6 +13,10 @@ export interface AppConfig {
     accessTtl: string;
     refreshTtl: string;
   };
+  storage: {
+    driver: string;
+    localPath: string;
+  };
 }
 
 export default (): AppConfig => ({
@@ -28,5 +32,9 @@ export default (): AppConfig => ({
     refreshSecret: process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret',
     accessTtl: process.env.JWT_ACCESS_TTL ?? '15m',
     refreshTtl: process.env.JWT_REFRESH_TTL ?? '7d',
+  },
+  storage: {
+    driver: process.env.STORAGE_DRIVER ?? 'local',
+    localPath: process.env.STORAGE_LOCAL_PATH ?? '.storage',
   },
 });

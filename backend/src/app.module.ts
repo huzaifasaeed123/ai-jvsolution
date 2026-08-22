@@ -11,6 +11,8 @@ import { ReferenceModule } from './modules/reference/reference.module';
 import { MandatesModule } from './modules/mandates/mandates.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { AccessModule } from './modules/access/access.module';
+import { StorageModule } from './modules/storage/storage.module';
+import { DataroomModule } from './modules/dataroom/dataroom.module';
 
 @Module({
   imports: [
@@ -24,7 +26,9 @@ import { AccessModule } from './modules/access/access.module';
     UsersModule,
     AuthModule,
     ReferenceModule,
+    StorageModule,
     AccessModule,
+    DataroomModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

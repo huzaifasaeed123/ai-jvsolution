@@ -9,6 +9,9 @@ export const AuditAction = {
   ACCESS_REVOKED: 'ACCESS_REVOKED',
   NDA_SIGNED: 'NDA_SIGNED',
   CONFIDENTIAL_VIEWED: 'CONFIDENTIAL_VIEWED',
+  DOCUMENT_UPLOADED: 'DOCUMENT_UPLOADED',
+  DOCUMENT_DOWNLOADED: 'DOCUMENT_DOWNLOADED',
+  DOCUMENT_VIEWED: 'DOCUMENT_VIEWED',
 } as const;
 
 export type AuditActionType = (typeof AuditAction)[keyof typeof AuditAction];

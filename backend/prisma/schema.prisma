@@ -182,6 +182,8 @@ model Opportunity {
   owner   User   @relation(fields: [ownerId], references: [id])
 
   accessRequests AccessRequest[]
+  folders        Folder[]
+  documents      Document[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -258,7 +260,7 @@ model AccessRequest {
 model AuditLog {
   id            String   @id @default(cuid())
   actorId       String?
-  action        String // ACCESS_REQUESTED, ACCESS_APPROVED, ACCESS_REJECTED, NDA_SIGNED, CONFIDENTIAL_VIEWED
+  action        String // ACCESS_REQUESTED, ACCESS_APPROVED, ACCESS_REJECTED, NDA_SIGNED, CONFIDENTIAL_VIEWED, DOCUMENT_VIEWED, DOCUMENT_DOWNLOADED, DOCUMENT_UPLOADED
   opportunityId String?
   targetUserId  String?
   metadata      Json?
@@ -266,4 +268,65 @@ model AuditLog {
 
   @@index([opportunityId])
   @@index([actorId])
+}
+
+// ============================================================
+// Secure Data Room (spec §10, §24, §27)
+// A permission-controlled document vault per opportunity. Files are streamed
+// through the API (never public URLs) so every access is authorized + audited.
+// minAccessLevel gates who can see a folder/document: PUBLIC/REGISTERED are
+// broadly visible; NDA (default) requires an approved + NDA-signed access grant.
+// ============================================================
+
+model Folder {
+  id             String       @id @default(cuid())
+  opportunityId  String
+  opportunity    Opportunity  @relation(fields: [opportunityId], references: [id])
+  parentId       String?
+  parent         Folder?      @relation("FolderTree", fields: [parentId], references: [id])
+  children       Folder[]     @relation("FolderTree")
+  code           String? // e.g. "01" for the standard section index
+  name           String
+  order          Int          @default(0)
+  minAccessLevel AccessLevel  @default(NDA)
+  documents      Document[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([opportunityId])
+  @@index([parentId])
+}
+
+model Document {
+  id             String            @id @default(cuid())
+  opportunityId  String
+  opportunity    Opportunity       @relation(fields: [opportunityId], references: [id])
+  folderId       String
+  folder         Folder            @relation(fields: [folderId], references: [id])
+  name           String
+  minAccessLevel AccessLevel? // overrides the folder level when set
+  createdById    String
+  versions       DocumentVersion[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  deletedAt      DateTime?
+
+  @@index([opportunityId])
+  @@index([folderId])
+}
+
+model DocumentVersion {
+  id           String   @id @default(cuid())
+  documentId   String
+  document     Document @relation(fields: [documentId], references: [id])
+  version      Int
+  storageKey   String // path/key within the storage driver
+  fileName     String
+  mimeType     String
+  sizeBytes    Int
+  uploadedById String
+  createdAt    DateTime @default(now())
+
+  @@unique([documentId, version])
+  @@index([documentId])
 }

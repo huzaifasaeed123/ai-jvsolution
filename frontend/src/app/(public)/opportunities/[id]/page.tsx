@@ -4,6 +4,8 @@ import { getOpportunity, getOpportunityReference } from '@/features/opportunitie
 import { getCurrentUser } from '@/lib/session';
 import { getMyRequestFor } from '@/features/access/api';
 import { AccessPanel } from '@/features/access/components/AccessPanel';
+import { getDataRoom } from '@/features/dataroom/api';
+import { DataRoom } from '@/features/dataroom/components/DataRoom';
 import {
   formatMoney,
   formatNumber,
@@ -27,10 +29,11 @@ export default async function OpportunityDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [o, reference, user] = await Promise.all([
+  const [o, reference, user, dataRoom] = await Promise.all([
     getOpportunity(id),
     getOpportunityReference(),
     getCurrentUser(),
+    getDataRoom(id),
   ]);
   if (!o) notFound();
 
@@ -120,6 +123,18 @@ export default async function OpportunityDetailPage({
             <Field label="Owner email" value={o.owner?.email} />
           </div>
         )}
+      </section>
+
+      {/* Data Room */}
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground/50">Data room</h2>
+        <div className="mt-3">
+          {dataRoom ? (
+            <DataRoom opportunityId={o.id} data={dataRoom} />
+          ) : (
+            <p className="text-sm text-foreground/50">Data room unavailable.</p>
+          )}
+        </div>
       </section>
     </article>
   );
