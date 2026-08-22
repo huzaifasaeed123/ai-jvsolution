@@ -6,7 +6,7 @@ import { formatMoney } from '@/features/opportunities/format';
 export function MatchCard({ match, sectorLabels }: { match: MatchItem; sectorLabels: Record<string, string> }) {
   const o = match.opportunity;
   return (
-    <div className="rounded-lg border border-foreground/10 p-5">
+    <div className="card p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <span className="font-mono text-xs text-foreground/50">{o.reference}</span>

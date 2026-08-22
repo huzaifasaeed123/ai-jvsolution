@@ -38,7 +38,7 @@ function RegisterForm() {
   }
 
   return (
-    <section className="mx-auto max-w-lg px-4 py-16 sm:px-6">
+    <section className="card mx-auto my-16 max-w-lg p-8">
       <h1 className="text-2xl font-semibold tracking-tight">Create your account</h1>
       <p className="mt-1 text-sm text-foreground/60">One account. Two sides of every venture.</p>
 

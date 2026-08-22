@@ -28,7 +28,7 @@ export function IncomingRequestRow({ request: r }: { request: AccessRequest }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-foreground/10 p-4">
+    <div className="card flex flex-wrap items-center justify-between gap-3 p-4">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${STATUS_STYLE[r.status]}`}>

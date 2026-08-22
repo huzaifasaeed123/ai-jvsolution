@@ -28,7 +28,7 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="mx-auto max-w-md px-4 py-16 sm:px-6">
+    <section className="card mx-auto my-16 max-w-md p-8">
       <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
       <p className="mt-1 text-sm text-foreground/60">Sign in to your account.</p>
 

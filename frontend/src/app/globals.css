@@ -1,26 +1,132 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================================
+   JV Solution — design tokens (institutional / premium)
+   Light + dark, driven by prefers-color-scheme.
+   ============================================================ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background: #f6f5f2; /* warm bone page */
+  --surface: #ffffff; /* cards */
+  --surface-2: #efece6; /* subtle raised / hover */
+  --foreground: #14181f; /* ink */
+  --muted: #5b6673; /* secondary text */
+  --border: rgba(20, 24, 31, 0.1);
+  --border-strong: rgba(20, 24, 31, 0.16);
+  --primary: #16324f; /* atlas deep blue */
+  --primary-foreground: #ffffff;
+  --accent: #a9782c; /* bronze / gold */
+  --accent-foreground: #ffffff;
+  --success: #157347;
+  --danger: #b42318;
+  --ring: rgba(22, 50, 79, 0.35);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 4px 12px -2px rgba(16, 24, 40, 0.08), 0 2px 6px -2px rgba(16, 24, 40, 0.06);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0d12;
+    --surface: #12161d;
+    --surface-2: #1a1f28;
+    --foreground: #e8e9ec;
+    --muted: #99a2ae;
+    --border: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --primary: #4f8fce;
+    --primary-foreground: #06101a;
+    --accent: #d0a24a;
+    --accent-foreground: #1a1206;
+    --success: #34c17a;
+    --danger: #f0685c;
+    --ring: rgba(79, 143, 206, 0.4);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 20px -4px rgba(0, 0, 0, 0.5);
   }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius-card: 0.875rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Reusable component classes (used across pages) */
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.6rem;
+    padding: 0.55rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .btn-outline {
+    border: 1px solid var(--border-strong);
+    color: var(--foreground);
+  }
+  .btn-outline:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  }
+  .input {
+    width: 100%;
+    border-radius: 0.6rem;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--ring);
+  }
 }

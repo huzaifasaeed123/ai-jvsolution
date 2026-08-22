@@ -2,8 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import { authApi } from './api';
+import { IconLogout } from '@/components/ui/icons';
 
-export function LogoutButton() {
+export function LogoutButton({ full = false }: { full?: boolean }) {
   const router = useRouter();
 
   async function onLogout() {
@@ -15,8 +16,9 @@ export function LogoutButton() {
   return (
     <button
       onClick={onLogout}
-      className="rounded-md border border-foreground/15 px-3 py-1.5 text-sm hover:bg-foreground/5"
+      className={`btn btn-outline ${full ? 'w-full' : ''}`}
     >
+      <IconLogout width={16} height={16} />
       Sign out
     </button>
   );
