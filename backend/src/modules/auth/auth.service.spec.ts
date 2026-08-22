@@ -1,4 +1,4 @@
-import { ConflictException, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
@@ -43,6 +43,14 @@ describe('AuthService', () => {
     await expect(
       service.register({ fullName: 'Jane', email: 'jane@example.com', password: 'strongpass123', role: Role.OWNER }),
     ).rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it('refuses self-registration as ADMIN (privilege-escalation guard)', async () => {
+    users.findByEmail.mockResolvedValue(null);
+    await expect(
+      service.register({ fullName: 'Sneaky', email: 'a@x.com', password: 'strongpass123', role: Role.ADMIN }),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(users.create).not.toHaveBeenCalled();
   });
 
   it('registers a new user and never returns the password hash', async () => {

@@ -1,7 +1,7 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { UsersService, SafeUser } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -23,6 +23,10 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResult> {
+    // Admin accounts are never self-registerable (privilege-escalation guard).
+    if (dto.role === Role.ADMIN) {
+      throw new ForbiddenException('This role cannot be self-registered');
+    }
     const existing = await this.users.findByEmail(dto.email.toLowerCase());
     if (existing) {
       throw new ConflictException('An account with this email already exists');
