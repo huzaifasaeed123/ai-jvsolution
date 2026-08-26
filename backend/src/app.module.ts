@@ -15,6 +15,8 @@ import { StorageModule } from './modules/storage/storage.module';
 import { DataroomModule } from './modules/dataroom/dataroom.module';
 import { DueDiligenceModule } from './modules/duediligence/duediligence.module';
 import { VerificationModule } from './modules/verification/verification.module';
+import { AiModule } from './modules/ai/ai.module';
+import { FeasibilityModule } from './modules/feasibility/feasibility.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { VerificationModule } from './modules/verification/verification.module';
     DataroomModule,
     DueDiligenceModule,
     VerificationModule,
+    AiModule,
+    FeasibilityModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

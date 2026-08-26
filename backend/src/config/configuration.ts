@@ -17,6 +17,9 @@ export interface AppConfig {
     driver: string;
     localPath: string;
   };
+  ai: {
+    provider: string;
+  };
 }
 
 export default (): AppConfig => ({
@@ -36,5 +39,8 @@ export default (): AppConfig => ({
   storage: {
     driver: process.env.STORAGE_DRIVER ?? 'local',
     localPath: process.env.STORAGE_LOCAL_PATH ?? '.storage',
+  },
+  ai: {
+    provider: process.env.AI_PROVIDER ?? 'template',
   },
 });

@@ -212,6 +212,7 @@ model Opportunity {
   documents         Document[]
   dueDiligenceItems DueDiligenceItem[]
   verificationRecord VerificationRecord?
+  feasibilityRuns   FeasibilityRun[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -364,6 +365,24 @@ model DocumentVersion {
 // A per-opportunity checklist. Each item carries receipt, review status, risk
 // rating, finding, mitigation, deadline and closure.
 // ============================================================
+
+// AI Feasibility run (spec §7, §42). Stores inputs + formula version +
+// assumptions + outputs so every result is reproducible and auditable.
+model FeasibilityRun {
+  id             String       @id @default(cuid())
+  opportunityId  String?
+  opportunity    Opportunity? @relation(fields: [opportunityId], references: [id])
+  createdById    String
+  label          String?
+  formulaVersion String
+  inputs         Json
+  assumptions    Json
+  outputs        Json
+  createdAt      DateTime     @default(now())
+
+  @@index([createdById])
+  @@index([opportunityId])
+}
 
 // Opportunity Passport verification (spec §23). Tier lives on Opportunity;
 // this record holds the verified fields, unresolved items, reviewer and date.

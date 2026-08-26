@@ -10,6 +10,7 @@ import {
   IconTarget,
   IconKey,
   IconSearch,
+  IconSpark,
 } from '@/components/ui/icons';
 import type { ReactNode } from 'react';
 
@@ -35,6 +36,7 @@ const NAV: NavItem[] = [
     roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'],
   },
   { href: '/dashboard/requests', label: 'Access requests', icon: <IconKey /> },
+  { href: '/dashboard/feasibility', label: 'AI Feasibility', icon: <IconSpark /> },
   { href: '/opportunities', label: 'Browse market', icon: <IconSearch /> },
 ];
 
