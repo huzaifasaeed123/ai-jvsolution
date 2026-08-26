@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { FeasibilityOutputs } from '../feasibility/feasibility.engine';
 import { ValuationResult } from '../valuation/valuation.engine';
 import { EstimateOutputs } from '../estimate/estimate.engine';
+import { RecommendationResult } from '../recommender/structure-recommender';
 
 /**
  * LLM provider abstraction (spec §35). Today it produces deterministic,
@@ -33,6 +34,22 @@ export class ExplainerService {
 
   explainValuation(currency: string, r: ValuationResult): Explanation {
     return { ...this.templateValuation(currency, r), method: 'template', confidence: 'deterministic', provider: this.provider };
+  }
+
+  explainRecommendation(r: RecommendationResult): Explanation {
+    const top = r.recommended;
+    if (!top) {
+      return { text: 'No structures could be scored for these inputs.', method: 'template', confidence: 'deterministic', provider: this.provider };
+    }
+    const alts = r.alternatives.map((a) => `${a.label} (${a.score})`).join(', ');
+    const text = [
+      `The best-fit structure is ${top.label} (score ${top.score}/100, grade ${top.grade}): ${top.reasons.slice(0, 3).join('; ')}.`,
+      alts ? `Close alternatives: ${alts}.` : '',
+      'One opportunity can also combine formulas — e.g. the top structure for the ownership/finance split with a revenue-share mechanism. This is guidance, not legal or financial advice.',
+    ]
+      .filter(Boolean)
+      .join(' ');
+    return { text, method: 'template', confidence: 'deterministic', provider: this.provider };
   }
 
   explainEstimate(o: EstimateOutputs): Explanation {
