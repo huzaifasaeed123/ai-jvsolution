@@ -214,6 +214,7 @@ model Opportunity {
   verificationRecord VerificationRecord?
   feasibilityRuns   FeasibilityRun[]
   valuationRuns     ValuationRun[]
+  estimateRuns      EstimateRun[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -378,6 +379,22 @@ model FeasibilityRun {
   formulaVersion String
   inputs         Json
   assumptions    Json
+  outputs        Json
+  createdAt      DateTime     @default(now())
+
+  @@index([createdById])
+  @@index([opportunityId])
+}
+
+// AI Estimate run (spec §8, §42). Stores inputs + formula version + outputs.
+model EstimateRun {
+  id             String       @id @default(cuid())
+  opportunityId  String?
+  opportunity    Opportunity? @relation(fields: [opportunityId], references: [id])
+  createdById    String
+  label          String?
+  formulaVersion String
+  inputs         Json
   outputs        Json
   createdAt      DateTime     @default(now())
 

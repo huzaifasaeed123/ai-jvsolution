@@ -4,6 +4,7 @@ import { Public } from '../../common/decorators/public.decorator';
 import { OPPORTUNITY_REFERENCE } from '../../common/reference/opportunity-reference';
 import { DUE_DILIGENCE_REFERENCE } from '../../common/reference/duediligence-categories';
 import { VERIFICATION_REFERENCE } from '../../common/reference/verification-reference';
+import { ESTIMATE_REFERENCE } from '../../common/reference/estimate-reference';
 
 @ApiTags('reference')
 @Controller('reference')
@@ -27,5 +28,12 @@ export class ReferenceController {
   @ApiOperation({ summary: 'Reference lists for verification (tiers, verifiable fields)' })
   verification() {
     return VERIFICATION_REFERENCE;
+  }
+
+  @Public()
+  @Get('estimate')
+  @ApiOperation({ summary: 'Reference lists for cost estimate (spec levels, unit bases, elements)' })
+  estimate() {
+    return ESTIMATE_REFERENCE;
   }
 }

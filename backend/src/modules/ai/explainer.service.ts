@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FeasibilityOutputs } from '../feasibility/feasibility.engine';
 import { ValuationResult } from '../valuation/valuation.engine';
+import { EstimateOutputs } from '../estimate/estimate.engine';
 
 /**
  * LLM provider abstraction (spec §35). Today it produces deterministic,
@@ -32,6 +33,19 @@ export class ExplainerService {
 
   explainValuation(currency: string, r: ValuationResult): Explanation {
     return { ...this.templateValuation(currency, r), method: 'template', confidence: 'deterministic', provider: this.provider };
+  }
+
+  explainEstimate(o: EstimateOutputs): Explanation {
+    const money = (n: number | null) =>
+      n === null ? '—' : `${o.currency} ${Math.round(n).toLocaleString()}`;
+    const perUnit =
+      o.costPerUnit !== null ? ` (${money(o.costPerUnit)} per ${o.unitBasis})` : '';
+    const text = [
+      `At a ${o.specLevel} specification (${money(o.rateUsed)}/m² build rate), the estimated total development cost for ${o.areaSqm.toLocaleString()} m² is ${money(o.totalDevelopmentCost)} — ${money(o.costPerSqm)}/m²${perUnit}.`,
+      `That includes ${money(o.professionalFees + o.authorityFees)} of fees, ${money(o.contingency)} contingency and ${money(o.escalation)} escalation.`,
+      'This is a benchmark estimate from the stated rate and assumptions, not a priced BoQ — confirm with a quantity surveyor.',
+    ].join(' ');
+    return { text, method: 'template', confidence: 'deterministic', provider: this.provider };
   }
 
   private templateValuation(currency: string, r: ValuationResult): { text: string } {

@@ -38,6 +38,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/requests', label: 'Access requests', icon: <IconKey /> },
   { href: '/dashboard/feasibility', label: 'AI Feasibility', icon: <IconSpark /> },
   { href: '/dashboard/valuation', label: 'AI Valuation', icon: <IconSpark /> },
+  { href: '/dashboard/estimate', label: 'AI Estimate', icon: <IconSpark /> },
   { href: '/opportunities', label: 'Browse market', icon: <IconSearch /> },
 ];
 
