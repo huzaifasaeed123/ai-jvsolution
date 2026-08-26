@@ -17,6 +17,7 @@ import { DueDiligenceModule } from './modules/duediligence/duediligence.module';
 import { VerificationModule } from './modules/verification/verification.module';
 import { AiModule } from './modules/ai/ai.module';
 import { FeasibilityModule } from './modules/feasibility/feasibility.module';
+import { ValuationModule } from './modules/valuation/valuation.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FeasibilityModule } from './modules/feasibility/feasibility.module';
     VerificationModule,
     AiModule,
     FeasibilityModule,
+    ValuationModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

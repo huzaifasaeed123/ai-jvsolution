@@ -213,6 +213,7 @@ model Opportunity {
   dueDiligenceItems DueDiligenceItem[]
   verificationRecord VerificationRecord?
   feasibilityRuns   FeasibilityRun[]
+  valuationRuns     ValuationRun[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -373,6 +374,24 @@ model FeasibilityRun {
   opportunityId  String?
   opportunity    Opportunity? @relation(fields: [opportunityId], references: [id])
   createdById    String
+  label          String?
+  formulaVersion String
+  inputs         Json
+  assumptions    Json
+  outputs        Json
+  createdAt      DateTime     @default(now())
+
+  @@index([createdById])
+  @@index([opportunityId])
+}
+
+// AI Valuation run (spec §9, §42). Stores method + inputs + assumptions + outputs.
+model ValuationRun {
+  id             String       @id @default(cuid())
+  opportunityId  String?
+  opportunity    Opportunity? @relation(fields: [opportunityId], references: [id])
+  createdById    String
+  method         String
   label          String?
   formulaVersion String
   inputs         Json
