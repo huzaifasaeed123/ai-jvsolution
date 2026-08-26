@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { ValuationService } from './valuation.service';
 import { ComputeValuationDto, SaveValuationDto } from './dto/compute-valuation.dto';
@@ -12,6 +12,7 @@ export class ValuationController {
   constructor(private readonly service: ValuationService) {}
 
   @Post('compute')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Compute a valuation (residual/comparable/income/dcf) + explanation' })
   compute(@Body() dto: ComputeValuationDto) {
     return this.service.compute(dto.method, dto.inputs);

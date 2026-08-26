@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { FeasibilityService } from './feasibility.service';
 import { ComputeFeasibilityDto, SaveFeasibilityDto } from './dto/compute-feasibility.dto';
@@ -12,6 +12,7 @@ export class FeasibilityController {
   constructor(private readonly service: FeasibilityService) {}
 
   @Post('compute')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Compute a feasibility model (stateless) + plain-language explanation' })
   compute(@Body() dto: ComputeFeasibilityDto) {
     return this.service.compute(dto);

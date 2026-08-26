@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { EstimateService } from './estimate.service';
 import { ComputeEstimateDto, SaveEstimateDto } from './dto/compute-estimate.dto';
@@ -12,6 +12,7 @@ export class EstimateController {
   constructor(private readonly service: EstimateService) {}
 
   @Post('compute')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Compute a cost estimate (stateless) + explanation' })
   compute(@Body() dto: ComputeEstimateDto) {
     return this.service.compute(dto);
