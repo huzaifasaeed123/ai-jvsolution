@@ -27,6 +27,31 @@ export interface Offer {
   updatedAt: string;
 }
 
+export interface CriterionScore {
+  key: string;
+  label: string;
+  weight: number;
+  normalized: number;
+  points: number;
+}
+
+export interface OfferComparisonRow {
+  offerId: string;
+  submittedByName: string;
+  score: number;
+  grade: 'A' | 'B' | 'C' | 'D';
+  criteria: CriterionScore[];
+  reasons: string[];
+}
+
+export interface ComparisonOutput {
+  version: string;
+  weights: Record<string, number>;
+  criteria: { key: string; label: string }[];
+  ranked: OfferComparisonRow[];
+  recommendedOfferId: string | null;
+}
+
 export interface OfferInput {
   structure?: string;
   investmentAmount?: number;

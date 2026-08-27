@@ -10,8 +10,9 @@ import { getDueDiligence, getDueDiligenceReference } from '@/features/duediligen
 import { DueDiligencePanel } from '@/features/duediligence/components/DueDiligencePanel';
 import { getVerification, getVerificationReference } from '@/features/verification/api';
 import { VerificationPanel } from '@/features/verification/components/VerificationPanel';
-import { listOffersForOpportunity, listMyOffers } from '@/features/offers/api';
+import { listOffersForOpportunity, listMyOffers, getOfferComparison } from '@/features/offers/api';
 import { OffersPanel } from '@/features/offers/components/OffersPanel';
+import { OfferComparison } from '@/features/offers/components/OfferComparison';
 import {
   formatMoney,
   formatNumber,
@@ -60,6 +61,7 @@ export default async function OpportunityDetailPage({
   const offers = isOwner ? await listOffersForOpportunity(id) : [];
   const myOffer = canOffer ? ((await listMyOffers()).find((of) => of.opportunityId === id) ?? null) : null;
   const showOffers = isOwner || canOffer;
+  const comparison = isOwner && offers.length >= 2 ? await getOfferComparison(id) : null;
 
   const sectorLabels = toLabelMap(reference.sectors);
   const structureLabels = toLabelMap(reference.structures);
@@ -187,6 +189,11 @@ export default async function OpportunityDetailPage({
               structures={reference.structures}
             />
           </div>
+          {comparison && (
+            <div className="mt-4">
+              <OfferComparison opportunityId={o.id} initial={comparison} />
+            </div>
+          )}
         </section>
       )}
     </article>

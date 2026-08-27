@@ -12,6 +12,7 @@ import { AccessService } from '../access/access.service';
 import { AuditService, AuditAction } from '../access/audit.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
+import { compareOffers, CompareOfferInput } from './offer-comparison';
 import { AuthUser } from '../../common/decorators/current-user.decorator';
 
 function majorToCents(major?: number): bigint | undefined {
@@ -97,6 +98,27 @@ export class OffersService {
     }
     const items = await this.repo.findForOpportunity(opportunityId);
     return items.map(serializeOffer);
+  }
+
+  /** Owner/admin: weighted, explainable comparison of active offers (spec §25). */
+  async compare(user: AuthUser, opportunityId: string, weights?: Record<string, number>) {
+    const opp = await this.opportunityOr404(opportunityId);
+    if (!this.isOwnerOrAdmin(user, opp.ownerId)) {
+      throw new ForbiddenException('Only the owner can compare offers');
+    }
+    const rows = await this.repo.findForOpportunity(opportunityId);
+    const active = rows.filter((o) => o.status !== 'WITHDRAWN' && o.status !== 'REJECTED');
+    const inputs: CompareOfferInput[] = active.map((o) => ({
+      offerId: o.id,
+      submittedByName: o.submittedBy.fullName,
+      ownerSharePct: o.ownerSharePct,
+      investmentAmount: o.investmentAmountCents === null ? null : Number(o.investmentAmountCents) / 100,
+      experienceYears: o.experienceYears,
+      financialCapacity: o.financialCapacityCents === null ? null : Number(o.financialCapacityCents) / 100,
+      developmentMonths: o.developmentMonths,
+      hasGuarantees: !!o.guarantees,
+    }));
+    return compareOffers(inputs, weights);
   }
 
   async listMine(user: AuthUser) {

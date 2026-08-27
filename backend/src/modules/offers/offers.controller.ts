@@ -13,6 +13,7 @@ import { Role } from '@prisma/client';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto, SetOfferStatusDto } from './dto/update-offer.dto';
+import { CompareOffersDto } from './dto/compare-offers.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthUser } from '../../common/decorators/current-user.decorator';
@@ -38,6 +39,17 @@ export class OffersController {
   @ApiOperation({ summary: 'List offers on an opportunity (owner/admin)' })
   listForOpportunity(@CurrentUser() user: AuthUser, @Param('opportunityId') opportunityId: string) {
     return this.service.listForOpportunity(user, opportunityId);
+  }
+
+  @Post('opportunities/:opportunityId/offers/compare')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Weighted, explainable comparison of received offers (owner/admin)' })
+  compare(
+    @CurrentUser() user: AuthUser,
+    @Param('opportunityId') opportunityId: string,
+    @Body() dto: CompareOffersDto,
+  ) {
+    return this.service.compare(user, opportunityId, dto.weights);
   }
 
   @Get('offers/mine')

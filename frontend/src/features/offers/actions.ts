@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { config } from '@/lib/config';
 import { getAccessToken } from '@/lib/session';
-import type { Offer, OfferInput, OfferStatus } from './types';
+import type { Offer, OfferInput, OfferStatus, ComparisonOutput } from './types';
 
 async function authed(path: string, init: RequestInit) {
   const token = await getAccessToken();
@@ -44,4 +44,14 @@ export async function withdrawOffer(offerId: string, opportunityId: string): Pro
 export async function setOfferStatus(offerId: string, opportunityId: string, status: OfferStatus): Promise<void> {
   await authed(`/offers/${offerId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
   revalidatePath(`/opportunities/${opportunityId}`);
+}
+
+export async function compareOffers(
+  opportunityId: string,
+  weights: Record<string, number>,
+): Promise<ComparisonOutput> {
+  return (await authed(`/opportunities/${opportunityId}/offers/compare`, {
+    method: 'POST',
+    body: JSON.stringify({ weights }),
+  })) as ComparisonOutput;
 }
