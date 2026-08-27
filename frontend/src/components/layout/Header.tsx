@@ -4,8 +4,10 @@ import { getCurrentUser } from '@/lib/session';
 import { LogoutButton } from '@/features/auth/LogoutButton';
 
 const NAV = [
+  { href: '/how-it-works', label: 'How it works' },
   { href: '/opportunities', label: 'Opportunities' },
   { href: '/countries', label: 'Country intelligence' },
+  { href: '/structures', label: 'Structures' },
 ];
 
 export async function Header() {

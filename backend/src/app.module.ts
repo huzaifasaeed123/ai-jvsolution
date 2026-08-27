@@ -25,6 +25,7 @@ import { ConsortiumsModule } from './modules/consortiums/consortiums.module';
 import { IndicatorsModule } from './modules/indicators/indicators.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { StatsModule } from './modules/stats/stats.module';
+import { StructuresModule } from './modules/structures/structures.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { StatsModule } from './modules/stats/stats.module';
     IndicatorsModule,
     CountriesModule,
     StatsModule,
+    StructuresModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
