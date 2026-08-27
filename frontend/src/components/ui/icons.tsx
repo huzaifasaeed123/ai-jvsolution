@@ -82,6 +82,66 @@ export function IconShield(p: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconChart(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M3 3v18h18" />
+      <path d="M7 15l3-4 3 3 4-6" />
+    </svg>
+  );
+}
+
+export function IconCoins(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <ellipse cx="12" cy="6" rx="8" ry="3" />
+      <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
+      <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
+    </svg>
+  );
+}
+
+export function IconRuler(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <rect x="2" y="8" width="20" height="8" rx="1.5" />
+      <path d="M6 8v3M10 8v4M14 8v3M18 8v4" />
+    </svg>
+  );
+}
+
+export function IconBranch(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <circle cx="6" cy="5" r="2.5" />
+      <circle cx="18" cy="5" r="2.5" />
+      <circle cx="12" cy="19" r="2.5" />
+      <path d="M6 7.5v3a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-3" />
+      <path d="M12 13.5v3" />
+    </svg>
+  );
+}
+
+export function IconInbox(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M3 12h5l2 3h4l2-3h5" />
+      <path d="M5 5h14l2 7v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z" />
+    </svg>
+  );
+}
+
+export function IconUsers(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16 5.5a3.5 3.5 0 0 1 0 7" />
+      <path d="M17.5 14.5A6 6 0 0 1 21.5 20" />
+    </svg>
+  );
+}
+
 export function IconSpark(p: SVGProps<SVGSVGElement>) {
   return (
     <svg {...base} {...p}>
