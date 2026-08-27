@@ -90,6 +90,15 @@ export default async function OpportunityDetailPage({
       </p>
       {o.summary && <p className="mt-4 max-w-2xl text-foreground/80">{o.summary}</p>}
 
+      {(isOwner || !o.confidentialLocked) && (
+        <Link
+          href={`/opportunities/${o.id}/dashboard`}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          📊 Open investor dashboard
+        </Link>
+      )}
+
       {/* Opportunity Passport */}
       {passport && (
         <div className="mt-6">

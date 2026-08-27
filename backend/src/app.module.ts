@@ -22,6 +22,7 @@ import { EstimateModule } from './modules/estimate/estimate.module';
 import { RecommenderModule } from './modules/recommender/recommender.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { ConsortiumsModule } from './modules/consortiums/consortiums.module';
+import { IndicatorsModule } from './modules/indicators/indicators.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ConsortiumsModule } from './modules/consortiums/consortiums.module';
     RecommenderModule,
     OffersModule,
     ConsortiumsModule,
+    IndicatorsModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
