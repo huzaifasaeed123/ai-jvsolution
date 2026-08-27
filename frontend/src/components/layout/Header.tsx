@@ -3,9 +3,10 @@ import { config } from '@/lib/config';
 import { getCurrentUser } from '@/lib/session';
 import { LogoutButton } from '@/features/auth/LogoutButton';
 
-// Only routes that exist today. Marketing pages (how-it-works, countries,
-// structures) are added in Step 6 and will be re-added here then.
-const NAV = [{ href: '/opportunities', label: 'Opportunities' }];
+const NAV = [
+  { href: '/opportunities', label: 'Opportunities' },
+  { href: '/countries', label: 'Country intelligence' },
+];
 
 export async function Header() {
   const user = await getCurrentUser();

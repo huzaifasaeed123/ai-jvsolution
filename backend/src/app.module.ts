@@ -23,6 +23,7 @@ import { RecommenderModule } from './modules/recommender/recommender.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { ConsortiumsModule } from './modules/consortiums/consortiums.module';
 import { IndicatorsModule } from './modules/indicators/indicators.module';
+import { CountriesModule } from './modules/countries/countries.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { IndicatorsModule } from './modules/indicators/indicators.module';
     OffersModule,
     ConsortiumsModule,
     IndicatorsModule,
+    CountriesModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
