@@ -21,6 +21,7 @@ import { ValuationModule } from './modules/valuation/valuation.module';
 import { EstimateModule } from './modules/estimate/estimate.module';
 import { RecommenderModule } from './modules/recommender/recommender.module';
 import { OffersModule } from './modules/offers/offers.module';
+import { ConsortiumsModule } from './modules/consortiums/consortiums.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { OffersModule } from './modules/offers/offers.module';
     EstimateModule,
     RecommenderModule,
     OffersModule,
+    ConsortiumsModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

@@ -41,6 +41,12 @@ const NAV: NavItem[] = [
     icon: <IconKey />,
     roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'],
   },
+  {
+    href: '/dashboard/consortiums',
+    label: 'Consortiums',
+    icon: <IconBuilding />,
+    roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'],
+  },
   { href: '/dashboard/requests', label: 'Access requests', icon: <IconKey /> },
   { href: '/dashboard/feasibility', label: 'AI Feasibility', icon: <IconSpark /> },
   { href: '/dashboard/valuation', label: 'AI Valuation', icon: <IconSpark /> },

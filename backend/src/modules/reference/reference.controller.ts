@@ -5,6 +5,7 @@ import { OPPORTUNITY_REFERENCE } from '../../common/reference/opportunity-refere
 import { DUE_DILIGENCE_REFERENCE } from '../../common/reference/duediligence-categories';
 import { VERIFICATION_REFERENCE } from '../../common/reference/verification-reference';
 import { ESTIMATE_REFERENCE } from '../../common/reference/estimate-reference';
+import { CONSORTIUM_REFERENCE } from '../../common/reference/consortium-roles';
 
 @ApiTags('reference')
 @Controller('reference')
@@ -35,5 +36,12 @@ export class ReferenceController {
   @ApiOperation({ summary: 'Reference lists for cost estimate (spec levels, unit bases, elements)' })
   estimate() {
     return ESTIMATE_REFERENCE;
+  }
+
+  @Public()
+  @Get('consortium')
+  @ApiOperation({ summary: 'Reference lists for consortiums (member roles)' })
+  consortium() {
+    return CONSORTIUM_REFERENCE;
   }
 }

@@ -88,6 +88,20 @@ enum AccessStatus {
   REVOKED
 }
 
+// Consortium formation (spec §15).
+enum ConsortiumStatus {
+  FORMING
+  ACTIVE
+  DISBANDED
+}
+
+enum MemberStatus {
+  INVITED
+  ACCEPTED
+  DECLINED
+  REMOVED
+}
+
 // Offer / EOI lifecycle (spec §25, §36).
 enum OfferType {
   EOI
@@ -156,6 +170,8 @@ model User {
   mandates     Mandate[]
   accessRequests AccessRequest[] @relation("AccessRequester")
   offers       Offer[]         @relation("OfferSubmitter")
+  consortiaLed Consortium[]    @relation("ConsortiumLead")
+  consortiumMemberships ConsortiumMember[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -232,6 +248,7 @@ model Opportunity {
   valuationRuns     ValuationRun[]
   estimateRuns      EstimateRun[]
   offers            Offer[]
+  consortiums       Consortium[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -401,6 +418,42 @@ model FeasibilityRun {
 
   @@index([createdById])
   @@index([opportunityId])
+}
+
+// Consortium of partners pursuing an opportunity together (spec §15).
+model Consortium {
+  id            String            @id @default(cuid())
+  name          String
+  description   String?
+  opportunityId String?
+  opportunity   Opportunity?      @relation(fields: [opportunityId], references: [id])
+  leadId        String
+  lead          User              @relation("ConsortiumLead", fields: [leadId], references: [id])
+  status        ConsortiumStatus  @default(FORMING)
+  members       ConsortiumMember[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([leadId])
+  @@index([opportunityId])
+}
+
+model ConsortiumMember {
+  id           String       @id @default(cuid())
+  consortiumId String
+  consortium   Consortium   @relation(fields: [consortiumId], references: [id])
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  role         String // consortium role code
+  equityPct    Float?
+  status       MemberStatus @default(INVITED)
+  invitedById  String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@unique([consortiumId, userId])
+  @@index([consortiumId])
+  @@index([userId])
 }
 
 // Offer / EOI on an opportunity (spec §25). Structured terms feed the
