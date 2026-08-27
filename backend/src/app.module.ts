@@ -20,6 +20,7 @@ import { FeasibilityModule } from './modules/feasibility/feasibility.module';
 import { ValuationModule } from './modules/valuation/valuation.module';
 import { EstimateModule } from './modules/estimate/estimate.module';
 import { RecommenderModule } from './modules/recommender/recommender.module';
+import { OffersModule } from './modules/offers/offers.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { RecommenderModule } from './modules/recommender/recommender.module';
     ValuationModule,
     EstimateModule,
     RecommenderModule,
+    OffersModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

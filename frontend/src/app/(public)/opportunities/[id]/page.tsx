@@ -10,6 +10,8 @@ import { getDueDiligence, getDueDiligenceReference } from '@/features/duediligen
 import { DueDiligencePanel } from '@/features/duediligence/components/DueDiligencePanel';
 import { getVerification, getVerificationReference } from '@/features/verification/api';
 import { VerificationPanel } from '@/features/verification/components/VerificationPanel';
+import { listOffersForOpportunity, listMyOffers } from '@/features/offers/api';
+import { OffersPanel } from '@/features/offers/components/OffersPanel';
 import {
   formatMoney,
   formatNumber,
@@ -50,6 +52,14 @@ export default async function OpportunityDetailPage({
   // access-request state to drive the request/NDA panel.
   const isOwner = !!user && !!o.owner && o.owner.id === user.id;
   const myRequest = o.confidentialLocked && user && !isOwner ? await getMyRequestFor(id) : null;
+
+  // Offers: owner sees incoming; an access-granted developer/investor can submit.
+  const canOffer =
+    !!user && !isOwner && !o.confidentialLocked &&
+    ['DEVELOPER', 'INVESTOR', 'ADMIN'].includes(user.role);
+  const offers = isOwner ? await listOffersForOpportunity(id) : [];
+  const myOffer = canOffer ? ((await listMyOffers()).find((of) => of.opportunityId === id) ?? null) : null;
+  const showOffers = isOwner || canOffer;
 
   const sectorLabels = toLabelMap(reference.sectors);
   const structureLabels = toLabelMap(reference.structures);
@@ -160,6 +170,25 @@ export default async function OpportunityDetailPage({
           <DueDiligencePanel opportunityId={o.id} data={dueDiligence} reference={ddReference} />
         </div>
       </section>
+
+      {/* Offers */}
+      {showOffers && (
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-foreground/50">
+            {isOwner ? 'Offers received' : 'Your offer'}
+          </h2>
+          <div className="mt-3">
+            <OffersPanel
+              opportunityId={o.id}
+              isOwner={isOwner}
+              canOffer={canOffer}
+              offers={offers}
+              myOffer={myOffer}
+              structures={reference.structures}
+            />
+          </div>
+        </section>
+      )}
     </article>
   );
 }

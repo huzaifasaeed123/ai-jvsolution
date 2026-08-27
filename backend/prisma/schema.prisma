@@ -88,6 +88,21 @@ enum AccessStatus {
   REVOKED
 }
 
+// Offer / EOI lifecycle (spec §25, §36).
+enum OfferType {
+  EOI
+  OFFER
+}
+
+enum OfferStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  SHORTLISTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
 // Due Diligence Centre (spec §11).
 enum RiskRating {
   CRITICAL
@@ -140,6 +155,7 @@ model User {
   opportunities Opportunity[]
   mandates     Mandate[]
   accessRequests AccessRequest[] @relation("AccessRequester")
+  offers       Offer[]         @relation("OfferSubmitter")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -215,6 +231,7 @@ model Opportunity {
   feasibilityRuns   FeasibilityRun[]
   valuationRuns     ValuationRun[]
   estimateRuns      EstimateRun[]
+  offers            Offer[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -383,6 +400,37 @@ model FeasibilityRun {
   createdAt      DateTime     @default(now())
 
   @@index([createdById])
+  @@index([opportunityId])
+}
+
+// Offer / EOI on an opportunity (spec §25). Structured terms feed the
+// weighted comparison engine (Step 2).
+model Offer {
+  id                   String      @id @default(cuid())
+  opportunityId        String
+  opportunity          Opportunity @relation(fields: [opportunityId], references: [id])
+  submittedById        String
+  submittedBy          User        @relation("OfferSubmitter", fields: [submittedById], references: [id])
+  ownerId              String // denormalized opportunity owner
+  type                 OfferType   @default(OFFER)
+  status               OfferStatus @default(SUBMITTED)
+  structure            String? // proposed JV structure code
+  currency             String      @default("USD")
+  investmentAmountCents BigInt? // capital offered
+  ownerSharePct        Float? // return offered to the owner (%)
+  targetIrr            Float?
+  developmentMonths    Int?
+  experienceYears      Int?
+  financialCapacityCents BigInt?
+  guarantees           String?
+  message              String?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  deletedAt           DateTime?
+
+  @@unique([opportunityId, submittedById]) // one active offer per user per opportunity
+  @@index([ownerId])
+  @@index([submittedById])
   @@index([opportunityId])
 }
 
