@@ -24,6 +24,7 @@ import { OffersModule } from './modules/offers/offers.module';
 import { ConsortiumsModule } from './modules/consortiums/consortiums.module';
 import { IndicatorsModule } from './modules/indicators/indicators.module';
 import { CountriesModule } from './modules/countries/countries.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { CountriesModule } from './modules/countries/countries.module';
     ConsortiumsModule,
     IndicatorsModule,
     CountriesModule,
+    StatsModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
