@@ -47,6 +47,14 @@ export const COMPANIES: SeedCompany[] = [
   { id: 'sd-co-idd', name: 'Indus Delta Developers', country: 'PK', brand: '2e6b5e' },
   { id: 'sd-co-srif', name: 'Silk Road Infrastructure', country: 'CN', brand: '8a2f2f' },
 
+  // --- Additional public bodies / holders (invented) ---
+  { id: 'sd-co-bsda', name: 'Bavarian State Development Agency', country: 'DE', brand: '46603f' },
+  { id: 'sd-co-rmta', name: 'Rhone Metropolitan Transport Agency', country: 'FR', brand: '2b4f6e' },
+  { id: 'sd-co-lvua', name: 'Levante Urban Agency', country: 'ES', brand: '9c4a2b' },
+  { id: 'sd-co-wsid', name: 'Western States Infrastructure District', country: 'US', brand: '1f3d5c' },
+  { id: 'sd-co-dmda', name: 'Deccan Metropolitan Development Authority', country: 'IN', brand: '6e3b2f' },
+  { id: 'sd-co-ypza', name: 'Yangtze Provincial Zone Administration', country: 'CN', brand: '5c2f4a' },
+
   // --- Investors / funds ---
   { id: 'sd-co-mcp', name: 'Meridian Capital Partners', country: 'GB', brand: '20304a' },
   { id: 'sd-co-bhi', name: 'Blue Harbour Investments', country: 'US', brand: '15496b' },
@@ -66,7 +74,7 @@ export interface SeedUser {
 }
 
 /**
- * 26 accounts. Every role is represented, every rung of the access ladder is
+ * 37 accounts. Every role is represented, every rung of the access ladder is
  * held by someone, and the countries match the twelve that the country
  * intelligence reference covers — so filters and country pages all have
  * something real to show.
@@ -90,6 +98,19 @@ export const USERS: SeedUser[] = [
   { id: 'sd-u-own-sa', email: 'owner.sa@jvsolution.test', fullName: 'Abdulaziz Al Harbi', role: Role.OWNER, accessLevel: AccessLevel.VERIFIED, country: 'SA', companyId: 'sd-co-npdc' },
   { id: 'sd-u-own-eg', email: 'owner.eg@jvsolution.test', fullName: 'Yasmin Fahmy', role: Role.OWNER, accessLevel: AccessLevel.NDA, country: 'EG', companyId: 'sd-co-ndda' },
   { id: 'sd-u-own-gb', email: 'owner.gb@jvsolution.test', fullName: 'Marcus Ellery', role: Role.OWNER, accessLevel: AccessLevel.VERIFIED, country: 'GB', companyId: 'sd-co-trta' },
+
+  { id: 'sd-u-gov-de', email: 'authority.de@jvsolution.test', fullName: 'Katharina Roth', role: Role.GOVERNMENT, accessLevel: AccessLevel.TRANSACTION, country: 'DE', companyId: 'sd-co-bsda' },
+  { id: 'sd-u-gov-fr', email: 'authority.fr@jvsolution.test', fullName: 'Julien Lefevre', role: Role.GOVERNMENT, accessLevel: AccessLevel.DUE_DILIGENCE, country: 'FR', companyId: 'sd-co-rmta' },
+  { id: 'sd-u-gov-es', email: 'authority.es@jvsolution.test', fullName: 'Marta Ibanez', role: Role.GOVERNMENT, accessLevel: AccessLevel.NDA, country: 'ES', companyId: 'sd-co-lvua' },
+  { id: 'sd-u-gov-us', email: 'authority.us@jvsolution.test', fullName: 'Gregory Hale', role: Role.GOVERNMENT, accessLevel: AccessLevel.TRANSACTION, country: 'US', companyId: 'sd-co-wsid' },
+  { id: 'sd-u-gov-in', email: 'authority.in@jvsolution.test', fullName: 'Priya Raghavan', role: Role.GOVERNMENT, accessLevel: AccessLevel.DUE_DILIGENCE, country: 'IN', companyId: 'sd-co-dmda' },
+  { id: 'sd-u-gov-cn', email: 'authority.cn@jvsolution.test', fullName: 'Hui Lin', role: Role.GOVERNMENT, accessLevel: AccessLevel.VERIFIED, country: 'CN', companyId: 'sd-co-ypza' },
+
+  { id: 'sd-u-own-de', email: 'owner.de@jvsolution.test', fullName: 'Stefan Kohler', role: Role.OWNER, accessLevel: AccessLevel.VERIFIED, country: 'DE', companyId: 'sd-co-nwd' },
+  { id: 'sd-u-own-fr', email: 'owner.fr@jvsolution.test', fullName: 'Amelie Girard', role: Role.OWNER, accessLevel: AccessLevel.REGISTERED, country: 'FR', companyId: 'sd-co-cvf' },
+  { id: 'sd-u-own-in', email: 'owner.in@jvsolution.test', fullName: 'Rohit Malhotra', role: Role.OWNER, accessLevel: AccessLevel.NDA, country: 'IN', companyId: 'sd-co-gmc' },
+  { id: 'sd-u-own-cn', email: 'owner.cn@jvsolution.test', fullName: 'Mei Sun', role: Role.OWNER, accessLevel: AccessLevel.VERIFIED, country: 'CN', companyId: 'sd-co-srif' },
+  { id: 'sd-u-own-us', email: 'owner.us@jvsolution.test', fullName: 'Rebecca Lindqvist', role: Role.OWNER, accessLevel: AccessLevel.DUE_DILIGENCE, country: 'US', companyId: 'sd-co-bhi' },
 
   // --- Developers / contractors / operators ---
   { id: 'sd-u-dev-ae', email: 'developer.ae@jvsolution.test', fullName: 'Rania Haddad', role: Role.DEVELOPER, accessLevel: AccessLevel.DUE_DILIGENCE, country: 'AE', companyId: 'sd-co-sol' },

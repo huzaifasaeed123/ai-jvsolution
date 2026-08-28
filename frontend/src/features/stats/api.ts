@@ -4,7 +4,12 @@ export interface PublicStats {
   publishedOpportunities: number;
   activeMandates: number;
   countriesWithOpportunities: number;
+  /** Normalised to a single currency; listings are priced locally. */
   totalProjectValue: number;
+  totalProjectValueCurrency: string;
+  totalProjectValueRatesVersion: string;
+  /** Listings left out because their currency has no reference rate. */
+  totalProjectValueExcluded: number;
   verifiedOpportunities: number;
   partners: number;
   documentsSecured: number;

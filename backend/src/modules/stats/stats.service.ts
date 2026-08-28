@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { COUNTRY_INTELLIGENCE } from '../../common/reference/country-intelligence';
 import { STRUCTURES } from '../../common/reference/opportunity-reference';
+import { toUsd, BASE_CURRENCY, RATES_VERSION } from '../../common/reference/fx';
 
 /**
  * Public platform statistics (spec §2 "public statistics area", §3 "make
@@ -17,7 +18,7 @@ export class StatsService {
       publishedOpportunities,
       activeMandates,
       countriesRepresented,
-      totalGdvCents,
+      valuedOpportunities,
       verifiedOpportunities,
       partners,
       documents,
@@ -29,9 +30,11 @@ export class StatsService {
         distinct: ['countryCode'],
         select: { countryCode: true },
       }),
-      this.prisma.opportunity.aggregate({
-        where: { status: 'PUBLISHED', deletedAt: null },
-        _sum: { projectValueCents: true },
+      // Listings are priced in local currency, so the total has to be
+      // normalised per row — a raw _sum would add PKR to USD one-for-one.
+      this.prisma.opportunity.findMany({
+        where: { status: 'PUBLISHED', deletedAt: null, projectValueCents: { not: null } },
+        select: { projectValueCents: true, currency: true },
       }),
       this.prisma.opportunity.count({
         where: { status: 'PUBLISHED', deletedAt: null, verification: { not: 'T0' } },
@@ -40,14 +43,26 @@ export class StatsService {
       this.prisma.document.count({ where: { deletedAt: null } }),
     ]);
 
-    const gdv = totalGdvCents._sum.projectValueCents;
+    // Rows in a currency the reference table does not cover are left out of the
+    // headline rather than counted at parity, and reported so the gap is visible.
+    let totalUsd = 0;
+    let excluded = 0;
+    for (const row of valuedOpportunities) {
+      const major = Number(row.projectValueCents) / 100;
+      const usd = toUsd(major, row.currency);
+      if (usd === null) excluded += 1;
+      else totalUsd += usd;
+    }
 
     return {
       // Live counts
       publishedOpportunities,
       activeMandates,
       countriesWithOpportunities: countriesRepresented.length,
-      totalProjectValue: gdv === null ? 0 : Number(gdv) / 100,
+      totalProjectValue: Math.round(totalUsd),
+      totalProjectValueCurrency: BASE_CURRENCY,
+      totalProjectValueRatesVersion: RATES_VERSION,
+      totalProjectValueExcluded: excluded,
       verifiedOpportunities,
       partners,
       documentsSecured: documents,

@@ -42,9 +42,10 @@ function Stat({ value, label }: { value: string; label: string }) {
   );
 }
 
-function compactMoney(n: number) {
+/** Listings are priced locally, so the API normalises before we format. */
+function compactMoney(n: number, currency: string) {
   if (n <= 0) return "—";
-  return new Intl.NumberFormat("en", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 1 }).format(n);
+  return new Intl.NumberFormat("en", { style: "currency", currency, notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
 export default async function Home() {
@@ -83,7 +84,10 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
             <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
               <Stat value={String(stats.publishedOpportunities)} label="Live opportunities" />
-              <Stat value={compactMoney(stats.totalProjectValue)} label="Project value listed" />
+              <Stat
+                value={compactMoney(stats.totalProjectValue, stats.totalProjectValueCurrency)}
+                label={`Project value listed (${stats.totalProjectValueCurrency} equivalent)`}
+              />
               <Stat value={String(stats.activeMandates)} label="Active mandates" />
               <Stat value={String(stats.marketsCovered)} label="Markets covered" />
             </div>
