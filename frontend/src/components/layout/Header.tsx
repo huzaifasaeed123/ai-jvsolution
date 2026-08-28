@@ -9,6 +9,7 @@ import type { MessageKey } from '@/i18n/messages';
 const NAV: { href: string; key: MessageKey }[] = [
   { href: '/how-it-works', key: 'nav.howItWorks' },
   { href: '/opportunities', key: 'nav.opportunities' },
+  { href: '/tenders', key: 'nav.tenders' },
   { href: '/countries', key: 'nav.countries' },
   { href: '/structures', key: 'nav.structures' },
 ];

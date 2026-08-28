@@ -12,6 +12,7 @@ const en = {
   'nav.opportunities': 'Opportunities',
   'nav.countries': 'Country intelligence',
   'nav.structures': 'Structures',
+  'nav.tenders': 'Tenders',
   'nav.dashboard': 'Dashboard',
   'nav.signIn': 'Sign in',
   'nav.join': 'Join',
@@ -38,6 +39,7 @@ export type Messages = Record<MessageKey, string>;
 
 /** Partial catalogs — anything absent falls back to English. */
 const ar: Partial<Messages> = {
+  'nav.tenders': 'المناقصات',
   'nav.howItWorks': 'كيف يعمل',
   'nav.opportunities': 'الفرص',
   'nav.countries': 'معلومات الدول',
@@ -50,6 +52,7 @@ const ar: Partial<Messages> = {
 };
 
 const ur: Partial<Messages> = {
+  'nav.tenders': 'ٹینڈرز',
   'nav.howItWorks': 'یہ کیسے کام کرتا ہے',
   'nav.opportunities': 'مواقع',
   'nav.countries': 'ممالک کی معلومات',
@@ -62,6 +65,7 @@ const ur: Partial<Messages> = {
 };
 
 const fr: Partial<Messages> = {
+  'nav.tenders': "Appels d'offres",
   'nav.howItWorks': 'Comment ça marche',
   'nav.opportunities': 'Opportunités',
   'nav.countries': 'Intelligence pays',
@@ -74,6 +78,7 @@ const fr: Partial<Messages> = {
 };
 
 const es: Partial<Messages> = {
+  'nav.tenders': 'Licitaciones',
   'nav.howItWorks': 'Cómo funciona',
   'nav.opportunities': 'Oportunidades',
   'nav.countries': 'Inteligencia de países',
@@ -86,6 +91,7 @@ const es: Partial<Messages> = {
 };
 
 const de: Partial<Messages> = {
+  'nav.tenders': 'Ausschreibungen',
   'nav.howItWorks': 'So funktioniert es',
   'nav.opportunities': 'Chancen',
   'nav.countries': 'Länderinformationen',
@@ -98,6 +104,7 @@ const de: Partial<Messages> = {
 };
 
 const zh: Partial<Messages> = {
+  'nav.tenders': '招标',
   'nav.howItWorks': '运作方式',
   'nav.opportunities': '机会',
   'nav.countries': '国家情报',
