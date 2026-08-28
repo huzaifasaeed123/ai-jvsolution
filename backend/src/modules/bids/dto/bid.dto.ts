@@ -3,6 +3,7 @@ import {
   IsBoolean,
   IsInt,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   Length,
@@ -52,4 +53,28 @@ export class DisqualifyBidDto {
   @IsString()
   @MaxLength(500)
   reason!: string;
+}
+
+export class EvaluateTenderDto {
+  @ApiPropertyOptional({
+    description:
+      'Authority scores for subjective criteria: { bidId: { criterionKey: 0-100 } }. Objective criteria are derived from bid data.',
+    type: 'object',
+    additionalProperties: { type: 'object', additionalProperties: { type: 'number' } },
+  })
+  @IsOptional()
+  @IsObject()
+  manualScores?: Record<string, Record<string, number>>;
+}
+
+export class AwardBidDto {
+  @ApiProperty({ description: 'The bid to name as preferred bidder' })
+  @IsString()
+  bidId!: string;
+
+  @ApiPropertyOptional({ description: 'Award rationale, recorded in the audit trail' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(1000)
+  rationale?: string;
 }

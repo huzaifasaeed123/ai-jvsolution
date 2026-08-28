@@ -24,6 +24,9 @@ export const AuditAction = {
   BID_SUBMITTED: 'BID_SUBMITTED',
   BID_WITHDRAWN: 'BID_WITHDRAWN',
   BID_DISQUALIFIED: 'BID_DISQUALIFIED',
+  BIDS_EVALUATED: 'BIDS_EVALUATED',
+  BID_AWARDED: 'BID_AWARDED',
+  TENDER_FINANCIAL_CLOSE: 'TENDER_FINANCIAL_CLOSE',
 } as const;
 
 export type AuditActionType = (typeof AuditAction)[keyof typeof AuditAction];

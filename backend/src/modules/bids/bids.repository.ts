@@ -83,4 +83,21 @@ export class BidsRepository {
   update(id: string, data: Prisma.BidUpdateInput): Promise<BidDetail> {
     return this.prisma.bid.update({ where: { id }, data, include: detailInclude });
   }
+
+  /** Mark every other live bid on the tender unsuccessful when one is awarded. */
+  markOthersUnsuccessful(tenderId: string, winningBidId: string): Promise<Prisma.BatchPayload> {
+    return this.prisma.bid.updateMany({
+      where: {
+        tenderId,
+        id: { not: winningBidId },
+        deletedAt: null,
+        status: { in: ['SUBMITTED', 'EVALUATED'] },
+      },
+      data: { status: 'UNSUCCESSFUL' },
+    });
+  }
+
+  setTenderStage(tenderId: string, stage: 'UNDER_EVALUATION' | 'PREFERRED_BIDDER' | 'FINANCIAL_CLOSE') {
+    return this.prisma.tender.update({ where: { id: tenderId }, data: { stage } });
+  }
 }

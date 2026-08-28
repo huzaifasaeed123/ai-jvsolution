@@ -11,7 +11,13 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { BidsService } from './bids.service';
-import { CreateBidDto, UpdateBidDto, DisqualifyBidDto } from './dto/bid.dto';
+import {
+  CreateBidDto,
+  UpdateBidDto,
+  DisqualifyBidDto,
+  EvaluateTenderDto,
+  AwardBidDto,
+} from './dto/bid.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthUser } from '../../common/decorators/current-user.decorator';
@@ -69,6 +75,38 @@ export class BidsController {
   @ApiOperation({ summary: 'Withdraw my bid (before the deadline only)' })
   withdraw(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.service.withdraw(user, id);
+  }
+
+  @Post('tenders/:tenderId/evaluate')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Score bids against the criteria published with the tender (authority, after the deadline)',
+  })
+  evaluate(
+    @CurrentUser() user: AuthUser,
+    @Param('tenderId') tenderId: string,
+    @Body() dto: EvaluateTenderDto,
+  ) {
+    return this.service.evaluate(user, tenderId, dto.manualScores);
+  }
+
+  @Post('tenders/:tenderId/award')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Name the preferred bidder; others become unsuccessful (authority)' })
+  award(
+    @CurrentUser() user: AuthUser,
+    @Param('tenderId') tenderId: string,
+    @Body() dto: AwardBidDto,
+  ) {
+    return this.service.award(user, tenderId, dto.bidId, dto.rationale);
+  }
+
+  @Post('tenders/:tenderId/financial-close')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Move an awarded tender to financial close (authority)' })
+  financialClose(@CurrentUser() user: AuthUser, @Param('tenderId') tenderId: string) {
+    return this.service.financialClose(user, tenderId);
   }
 
   @Post('bids/:id/disqualify')
