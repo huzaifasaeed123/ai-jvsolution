@@ -88,6 +88,26 @@ enum AccessStatus {
   REVOKED
 }
 
+// Government procurement (spec §13).
+enum ProcurementType {
+  RFI // request for information
+  RFQ // request for qualification
+  RFP // request for proposal
+  ITT // invitation to tender
+  UNSOLICITED // unsolicited proposal (may trigger a Swiss Challenge)
+}
+
+enum TenderStage {
+  DRAFT
+  PUBLISHED
+  CLARIFICATION
+  SUBMISSION_CLOSED
+  UNDER_EVALUATION
+  PREFERRED_BIDDER
+  FINANCIAL_CLOSE
+  CANCELLED
+}
+
 // Consortium formation (spec §15).
 enum ConsortiumStatus {
   FORMING
@@ -172,6 +192,7 @@ model User {
   offers       Offer[]         @relation("OfferSubmitter")
   consortiaLed Consortium[]    @relation("ConsortiumLead")
   consortiumMemberships ConsortiumMember[]
+  tendersPublished Tender[]    @relation("TenderAuthority")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -249,6 +270,7 @@ model Opportunity {
   estimateRuns      EstimateRun[]
   offers            Offer[]
   consortiums       Consortium[]
+  tenders           Tender[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -418,6 +440,57 @@ model FeasibilityRun {
 
   @@index([createdById])
   @@index([opportunityId])
+}
+
+// ============================================================
+// Government tender / bid room (spec §13)
+// A formal, deadline-driven procurement against an opportunity. Evaluation
+// criteria are published UP FRONT so scoring is transparent and defensible.
+// ============================================================
+
+model Tender {
+  id            String          @id @default(cuid())
+  reference     String          @unique // e.g. TND-AE-4F2A91
+  opportunityId String
+  opportunity   Opportunity     @relation(fields: [opportunityId], references: [id])
+  authorityId   String // the publishing authority (opportunity owner)
+  authority     User            @relation("TenderAuthority", fields: [authorityId], references: [id])
+
+  title            String
+  procurementType  ProcurementType @default(RFP)
+  stage            TenderStage     @default(DRAFT)
+
+  // Employer / output requirements (spec §13)
+  employerRequirements String?
+  outputSpecification  String?
+  siteInformation      String?
+  governmentSupport    String?
+  paymentMechanism     String? // government-pay / user-pay / hybrid
+
+  // Risk allocation matrix — [{ risk, bearer, notes }]
+  riskAllocation Json?
+
+  // Weighted evaluation criteria, published up front — [{ key, label, weight }]
+  evaluationCriteria Json?
+
+  // Commercial envelope
+  currency            String  @default("USD")
+  estimatedValueCents BigInt?
+  bidSecurityCents    BigInt?
+  concessionYears     Int?
+
+  // Key dates
+  clarificationDeadline DateTime?
+  submissionDeadline    DateTime?
+  publishedAt           DateTime?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([opportunityId])
+  @@index([authorityId])
+  @@index([stage])
 }
 
 // Consortium of partners pursuing an opportunity together (spec §15).

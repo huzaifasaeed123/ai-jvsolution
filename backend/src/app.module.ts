@@ -26,6 +26,7 @@ import { IndicatorsModule } from './modules/indicators/indicators.module';
 import { CountriesModule } from './modules/countries/countries.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { StructuresModule } from './modules/structures/structures.module';
+import { TendersModule } from './modules/tenders/tenders.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { StructuresModule } from './modules/structures/structures.module';
     CountriesModule,
     StatsModule,
     StructuresModule,
+    TendersModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,

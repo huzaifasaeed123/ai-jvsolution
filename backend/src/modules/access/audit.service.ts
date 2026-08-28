@@ -17,6 +17,9 @@ export const AuditAction = {
   OFFER_UPDATED: 'OFFER_UPDATED',
   OFFER_WITHDRAWN: 'OFFER_WITHDRAWN',
   OFFER_STATUS_CHANGED: 'OFFER_STATUS_CHANGED',
+  TENDER_CREATED: 'TENDER_CREATED',
+  TENDER_UPDATED: 'TENDER_UPDATED',
+  TENDER_STAGE_CHANGED: 'TENDER_STAGE_CHANGED',
 } as const;
 
 export type AuditActionType = (typeof AuditAction)[keyof typeof AuditAction];

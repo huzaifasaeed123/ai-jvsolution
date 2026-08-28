@@ -6,6 +6,7 @@ import { DUE_DILIGENCE_REFERENCE } from '../../common/reference/duediligence-cat
 import { VERIFICATION_REFERENCE } from '../../common/reference/verification-reference';
 import { ESTIMATE_REFERENCE } from '../../common/reference/estimate-reference';
 import { CONSORTIUM_REFERENCE } from '../../common/reference/consortium-roles';
+import { PROCUREMENT_REFERENCE } from '../../common/reference/procurement-reference';
 
 @ApiTags('reference')
 @Controller('reference')
@@ -43,5 +44,14 @@ export class ReferenceController {
   @ApiOperation({ summary: 'Reference lists for consortiums (member roles)' })
   consortium() {
     return CONSORTIUM_REFERENCE;
+  }
+
+  @Public()
+  @Get('procurement')
+  @ApiOperation({
+    summary: 'Reference lists for tenders (types, stages, payment mechanisms, risk matrix, criteria)',
+  })
+  procurement() {
+    return PROCUREMENT_REFERENCE;
   }
 }
