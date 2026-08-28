@@ -67,3 +67,30 @@ export interface TenderBids {
   count: number;
   bids: Bid[];
 }
+
+/** Evaluation (spec §13) — scored against the criteria published with the tender. */
+export interface CriterionResult {
+  key: string;
+  label: string;
+  weight: number;
+  normalized: number;
+  points: number;
+  source: 'objective' | 'manual' | 'unscored';
+}
+
+export interface BidEvaluation {
+  bidId: string;
+  reference: string;
+  bidderName: string;
+  score: number;
+  rank: number;
+  criteria: CriterionResult[];
+  notes: string[];
+}
+
+export interface EvaluationOutput {
+  version: string;
+  criteria: { key: string; label: string; weight: number }[];
+  evaluated: BidEvaluation[];
+  recommendedBidId: string | null;
+}

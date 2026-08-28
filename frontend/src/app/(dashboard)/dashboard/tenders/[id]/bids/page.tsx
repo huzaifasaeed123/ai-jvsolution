@@ -4,6 +4,10 @@ import { getTender } from '@/features/tenders/api';
 import { listBidsForTender } from '@/features/bids/api';
 import { Badge } from '@/components/ui/Badge';
 import { BID_STATUS_LABEL, BID_STATUS_TONE } from '@/features/bids/format';
+import {
+  EvaluationPanel,
+  DisqualifyBid,
+} from '@/features/bids/components/EvaluationPanel';
 import { formatDate } from '@/features/tenders/format';
 
 export const metadata = { title: 'Received bids' };
@@ -97,15 +101,34 @@ export default async function TenderBidsPage({ params }: { params: Promise<{ id:
                   {b.disqualifiedReason && (
                     <p className="mt-2 text-sm text-red-500">Disqualified: {b.disqualifiedReason}</p>
                   )}
+
+                  {!received.sealed && (
+                    <div className="mt-2 flex justify-end">
+                      <DisqualifyBid bid={b} tenderId={id} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
 
-          {!received.sealed && received.bids.length > 0 && (
-            <p className="mt-4 text-sm text-muted">
-              Scoring and award are added in the next step.
-            </p>
+          {/* Evaluation opens only once bids unseal */}
+          {received.bids.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Evaluation</h2>
+              <div className="mt-3">
+                {received.sealed ? (
+                  <p className="card p-6 text-sm text-muted">
+                    🔒 Evaluation opens after the submission deadline
+                    {received.submissionDeadline ? ` (${formatDate(received.submissionDeadline)})` : ''}.
+                    Scoring uses the criteria published with the tender, so the rule cannot change
+                    once bids are opened.
+                  </p>
+                ) : (
+                  <EvaluationPanel tender={tender} bids={received.bids} />
+                )}
+              </div>
+            </div>
           )}
         </>
       )}

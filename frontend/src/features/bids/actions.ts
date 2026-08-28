@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { config } from '@/lib/config';
 import { getAccessToken } from '@/lib/session';
-import type { Bid, BidInput } from './types';
+import type { Bid, BidInput, EvaluationOutput } from './types';
 
 async function authed(path: string, init: RequestInit) {
   const token = await getAccessToken();
@@ -57,6 +57,47 @@ export async function withdrawBid(bidId: string): Promise<Bid> {
   revalidatePath('/dashboard/bids');
   revalidatePath(`/dashboard/bids/${bidId}`);
   return bid;
+}
+
+/** Authority: score the field against the tender's published criteria. */
+export async function evaluateTender(
+  tenderId: string,
+  manualScores?: Record<string, Record<string, number>>,
+): Promise<EvaluationOutput> {
+  return (await authed(`/tenders/${tenderId}/evaluate`, {
+    method: 'POST',
+    body: JSON.stringify({ manualScores }),
+  })) as EvaluationOutput;
+}
+
+/** Authority: name the preferred bidder; other live bids become unsuccessful. */
+export async function awardTender(tenderId: string, bidId: string, rationale?: string) {
+  const r = await authed(`/tenders/${tenderId}/award`, {
+    method: 'POST',
+    body: JSON.stringify({ bidId, rationale }),
+  });
+  revalidatePath(`/dashboard/tenders/${tenderId}`);
+  revalidatePath(`/dashboard/tenders/${tenderId}/bids`);
+  revalidatePath('/dashboard/bids');
+  return r;
+}
+
+/** Authority: move an awarded tender to financial close. */
+export async function financialClose(tenderId: string) {
+  const r = await authed(`/tenders/${tenderId}/financial-close`, { method: 'POST' });
+  revalidatePath(`/dashboard/tenders/${tenderId}`);
+  revalidatePath(`/dashboard/tenders/${tenderId}/bids`);
+  return r;
+}
+
+/** Authority: disqualify a bid for failing a mandatory requirement. */
+export async function disqualifyBid(bidId: string, tenderId: string, reason: string) {
+  const r = await authed(`/bids/${bidId}/disqualify`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+  revalidatePath(`/dashboard/tenders/${tenderId}/bids`);
+  return r;
 }
 
 export async function askClarification(tenderId: string, question: string) {
