@@ -108,6 +108,18 @@ enum TenderStage {
   CANCELLED
 }
 
+// Bid lifecycle (spec §13). Bids stay SEALED until the submission deadline —
+// the authority cannot read them early.
+enum BidStatus {
+  DRAFT // bidder is still preparing
+  SUBMITTED // sealed, awaiting the deadline
+  WITHDRAWN // pulled before the deadline
+  DISQUALIFIED // failed a mandatory requirement
+  EVALUATED // scored during evaluation
+  PREFERRED // selected as preferred bidder
+  UNSUCCESSFUL
+}
+
 // Consortium formation (spec §15).
 enum ConsortiumStatus {
   FORMING
@@ -193,6 +205,7 @@ model User {
   consortiaLed Consortium[]    @relation("ConsortiumLead")
   consortiumMemberships ConsortiumMember[]
   tendersPublished Tender[]    @relation("TenderAuthority")
+  bids         Bid[]           @relation("BidSubmitter")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -484,6 +497,8 @@ model Tender {
   submissionDeadline    DateTime?
   publishedAt           DateTime?
 
+  bids Bid[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -491,6 +506,56 @@ model Tender {
   @@index([opportunityId])
   @@index([authorityId])
   @@index([stage])
+}
+
+// A bidder's response to a tender (spec §13). Technical and financial content
+// are held in separate envelopes and stay sealed until the deadline passes.
+model Bid {
+  id        String    @id @default(cuid())
+  reference String    @unique // e.g. BID-4F2A91
+  tenderId  String
+  tender    Tender    @relation(fields: [tenderId], references: [id])
+  bidderId  String
+  bidder    User      @relation("BidSubmitter", fields: [bidderId], references: [id])
+  /// Optional joint bid vehicle (spec §15).
+  consortiumId String?
+  consortium   Consortium? @relation(fields: [consortiumId], references: [id])
+
+  status BidStatus @default(DRAFT)
+
+  // Technical envelope
+  technicalProposal String?
+  methodology       String?
+  deliveryMonths    Int?
+  experienceYears   Int?
+  keyPersonnel      String?
+  localContentPct   Float?
+
+  // Financial envelope
+  currency          String  @default("USD")
+  bidPriceCents     BigInt?
+  annualPaymentCents BigInt? // availability / concession payment
+  revenueSharePct   Float?
+  financialCapacityCents BigInt?
+
+  // Compliance (spec §13 submission checklist)
+  bidSecurityProvided Boolean @default(false)
+  checklistComplete   Boolean @default(false)
+  declarations        String?
+
+  submittedAt DateTime?
+  withdrawnAt DateTime?
+  /// Set by the authority when a mandatory requirement fails.
+  disqualifiedReason String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([tenderId, bidderId]) // one bid per bidder per tender
+  @@index([tenderId])
+  @@index([bidderId])
+  @@index([status])
 }
 
 // Consortium of partners pursuing an opportunity together (spec §15).
@@ -504,6 +569,7 @@ model Consortium {
   lead          User              @relation("ConsortiumLead", fields: [leadId], references: [id])
   status        ConsortiumStatus  @default(FORMING)
   members       ConsortiumMember[]
+  bids          Bid[]
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
 

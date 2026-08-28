@@ -27,6 +27,7 @@ import { CountriesModule } from './modules/countries/countries.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { StructuresModule } from './modules/structures/structures.module';
 import { TendersModule } from './modules/tenders/tenders.module';
+import { BidsModule } from './modules/bids/bids.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { TendersModule } from './modules/tenders/tenders.module';
     StatsModule,
     StructuresModule,
     TendersModule,
+    BidsModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
