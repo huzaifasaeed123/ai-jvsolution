@@ -4,6 +4,7 @@ import { OffersRepository } from './offers.repository';
 import { AccessService } from '../access/access.service';
 import { AuditService } from '../access/audit.service';
 import { AuthUser } from '../../common/decorators/current-user.decorator';
+import { OfferType, OfferStatus } from '@prisma/client';
 
 const owner: AuthUser = { id: 'own-1', email: 'o@x.com', role: 'OWNER', accessLevel: 'REGISTERED' };
 const dev: AuthUser = { id: 'dev-1', email: 'd@x.com', role: 'DEVELOPER', accessLevel: 'REGISTERED' };
@@ -14,12 +15,18 @@ function offerRow(over: Record<string, unknown> = {}) {
     opportunityId: 'op-1',
     submittedById: 'dev-1',
     ownerId: 'own-1',
-    type: 'OFFER',
-    status: 'SUBMITTED',
+    type: OfferType.OFFER,
+    status: OfferStatus.SUBMITTED,
     currency: 'USD',
     investmentAmountCents: null,
     financialCapacityCents: null,
     ownerSharePct: 30,
+    targetIrr: null,
+    structure: null,
+    message: null,
+    developmentMonths: null,
+    experienceYears: null,
+    guarantees: null,
     submittedBy: { id: 'dev-1', fullName: 'Dev', email: 'd@x.com', companyId: null },
     createdAt: new Date(),
     updatedAt: new Date(),

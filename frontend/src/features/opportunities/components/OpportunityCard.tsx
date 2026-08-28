@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { CoverImage } from '@/components/ui/Media';
 import type { Opportunity } from '../types';
 import { formatMoney, formatNumber, OWNER_CATEGORY_LABEL, VERIFICATION_LABEL } from '../format';
 
@@ -12,8 +13,16 @@ export function OpportunityCard({
   return (
     <Link
       href={`/opportunities/${o.id}`}
-      className="card block p-5 transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
+      className="card block overflow-hidden transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
     >
+      <CoverImage
+        src={o.coverImageUrl}
+        alt={o.title}
+        seed={o.reference}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+      />
+
+      <div className="p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="font-mono text-xs text-foreground/50">{o.reference}</span>
         <span className="rounded bg-foreground/10 px-1.5 py-0.5 text-[11px] font-medium">
@@ -45,6 +54,7 @@ export function OpportunityCard({
       <div className="mt-4 flex items-center justify-between text-xs text-foreground/50">
         <span>{VERIFICATION_LABEL[o.verification]}</span>
         <span>{formatNumber(o.landAreaSqm, ' m²')}</span>
+      </div>
       </div>
     </Link>
   );

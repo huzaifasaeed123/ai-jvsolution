@@ -15,6 +15,7 @@ export interface User {
   role: Role;
   accessLevel: AccessLevel;
   country: string | null;
+  avatarUrl: string | null;
   companyId: string | null;
   createdAt: string;
   updatedAt: string;

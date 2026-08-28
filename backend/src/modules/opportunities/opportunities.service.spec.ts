@@ -15,6 +15,8 @@ function fakeOpportunity(overrides: Partial<OpportunityWithOwner> = {}): Opportu
     ownerCategory: OwnerCategory.PRIVATE,
     status: OpportunityStatus.PUBLISHED,
     verification: VerificationTier.T0,
+    coverImageUrl: null,
+    galleryUrls: [],
     countryCode: 'AE',
     region: null,
     city: null,

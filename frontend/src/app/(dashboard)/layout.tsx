@@ -15,7 +15,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex min-h-screen">
-      <DashboardSidebar user={{ fullName: user.fullName, email: user.email, role: user.role }} />
+      <DashboardSidebar
+        user={{
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          avatarUrl: user.avatarUrl,
+        }}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile bar */}

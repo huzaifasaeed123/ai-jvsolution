@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogoutButton } from '@/features/auth/LogoutButton';
+import { Avatar } from '@/components/ui/Media';
 import { config } from '@/lib/config';
 import {
   IconGrid,
@@ -68,7 +69,7 @@ const GROUPS: NavGroup[] = [
 export function DashboardSidebar({
   user,
 }: {
-  user: { fullName: string; email: string; role: string };
+  user: { fullName: string; email: string; role: string; avatarUrl?: string | null };
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -132,9 +133,7 @@ export function DashboardSidebar({
   const footer = (
     <div className="border-t border-border p-4">
       <div className="flex items-center gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent/15 text-sm font-semibold text-accent">
-          {user.fullName.charAt(0).toUpperCase()}
-        </span>
+        <Avatar src={user.avatarUrl} name={user.fullName} size={36} />
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{user.fullName}</p>
           <p className="truncate text-xs text-muted">{user.role.toLowerCase()}</p>

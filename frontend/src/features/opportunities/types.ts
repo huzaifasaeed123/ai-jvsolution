@@ -18,6 +18,10 @@ export interface Opportunity {
   status: OpportunityStatus;
   verification: VerificationTier;
 
+  /** Marketing imagery — public. Absent on older records, so always guard. */
+  coverImageUrl: string | null;
+  galleryUrls: string[];
+
   countryCode: string;
   region: string | null;
   city: string | null;

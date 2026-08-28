@@ -16,6 +16,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     role: Role.OWNER,
     accessLevel: AccessLevel.REGISTERED,
     country: 'AE',
+    avatarUrl: null,
     companyId: null,
     createdAt: new Date(),
     updatedAt: new Date(),

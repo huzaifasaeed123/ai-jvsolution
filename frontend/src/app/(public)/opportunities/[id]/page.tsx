@@ -15,6 +15,7 @@ import { OffersPanel } from '@/features/offers/components/OffersPanel';
 import { OfferComparison } from '@/features/offers/components/OfferComparison';
 import { Tabs } from '@/components/ui/Tabs';
 import { Badge } from '@/components/ui/Badge';
+import { CoverImage, Gallery } from '@/components/ui/Media';
 import {
   formatMoney,
   formatNumber,
@@ -178,7 +179,18 @@ export default async function OpportunityDetailPage({
       </Link>
 
       {/* Hero */}
-      <div className="card mt-4 p-6">
+      <div className="card mt-4 overflow-hidden">
+        {o.coverImageUrl && (
+          <CoverImage
+            src={o.coverImageUrl}
+            alt={o.title}
+            seed={o.reference}
+            sizes="(max-width: 1024px) 100vw, 1024px"
+            priority
+            className="aspect-[21/9]"
+          />
+        )}
+        <div className="p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -210,6 +222,9 @@ export default async function OpportunityDetailPage({
           <Field label="Investment" value={formatMoney(o.investmentRequired, o.currency)} />
           <Field label="Target IRR" value={o.targetIrr ? `${o.targetIrr}%` : '—'} />
           <Field label="Land area" value={formatNumber(o.landAreaSqm, ' m²')} />
+        </div>
+
+        <Gallery urls={o.galleryUrls ?? []} alt={o.title} />
         </div>
       </div>
 

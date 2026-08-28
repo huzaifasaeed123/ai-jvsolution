@@ -24,6 +24,10 @@ function publicView(o: OpportunityWithOwner) {
     status: o.status,
     verification: o.verification,
 
+    // Marketing imagery — public by design (no site plans, no exact location)
+    coverImageUrl: o.coverImageUrl,
+    galleryUrls: o.galleryUrls,
+
     // Location — coarse only
     countryCode: o.countryCode,
     region: o.region,

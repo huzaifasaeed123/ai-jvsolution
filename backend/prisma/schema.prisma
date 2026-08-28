@@ -192,6 +192,8 @@ model Company {
   id        String   @id @default(cuid())
   name      String
   country   String?
+  /// Public brand mark. External URL in dev/demo; object-storage key in prod.
+  logoUrl   String?
   users     User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -205,6 +207,8 @@ model User {
   role         Role
   accessLevel  AccessLevel   @default(REGISTERED)
   country      String?
+  /// Public profile image. External URL in dev/demo; object-storage key in prod.
+  avatarUrl    String?
   companyId    String?
   company      Company?      @relation(fields: [companyId], references: [id])
   opportunities Opportunity[]
@@ -239,6 +243,12 @@ model Opportunity {
   sector        String // validated against reference SECTORS
   projectType   String? // validated against reference PROJECT_TYPES
   ownerCategory OwnerCategory @default(PRIVATE)
+
+  /// Public imagery. A cover shown on cards/listings plus an ordered gallery.
+  /// These are marketing visuals only — never site plans or anything that
+  /// would pinpoint the asset, which stay in the permissioned data room.
+  coverImageUrl String?
+  galleryUrls   String[]
 
   status       OpportunityStatus @default(DRAFT)
   verification VerificationTier  @default(T0)
