@@ -108,6 +108,15 @@ enum TenderStage {
   CANCELLED
 }
 
+// Swiss Challenge on an unsolicited proposal (spec §3, §13).
+enum ChallengeStatus {
+  OPEN // counter-proposals accepted
+  CLOSED // window elapsed, awaiting decision
+  ORIGINAL_WINS // originator retained the award
+  CHALLENGER_WINS // a counter-proposal prevailed
+  CANCELLED
+}
+
 // Bid lifecycle (spec §13). Bids stay SEALED until the submission deadline —
 // the authority cannot read them early.
 enum BidStatus {
@@ -206,6 +215,8 @@ model User {
   consortiumMemberships ConsortiumMember[]
   tendersPublished Tender[]    @relation("TenderAuthority")
   bids         Bid[]           @relation("BidSubmitter")
+  clarificationsAsked Clarification[] @relation("ClarificationAsker")
+  challengesOriginated SwissChallenge[] @relation("ChallengeOriginator")
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -497,7 +508,10 @@ model Tender {
   submissionDeadline    DateTime?
   publishedAt           DateTime?
 
-  bids Bid[]
+  bids           Bid[]
+  clarifications Clarification[]
+  addenda        Addendum[]
+  swissChallenge SwissChallenge?
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -506,6 +520,68 @@ model Tender {
   @@index([opportunityId])
   @@index([authorityId])
   @@index([stage])
+}
+
+// Bidder question + authority answer (spec §13). Once answered, the Q&A is
+// visible to EVERY bidder — no private guidance, which keeps the field level.
+model Clarification {
+  id        String   @id @default(cuid())
+  tenderId  String
+  tender    Tender   @relation(fields: [tenderId], references: [id])
+  askedById String
+  askedBy   User     @relation("ClarificationAsker", fields: [askedById], references: [id])
+  question  String
+  answer    String?
+  answeredById String?
+  answeredAt   DateTime?
+  /// Published answers are visible to all bidders; unanswered questions stay
+  /// private to the asker and the authority.
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenderId])
+  @@index([askedById])
+}
+
+// A formal, numbered amendment to a published tender (spec §13). Addenda are
+// append-only — the sequence is the audit trail of what changed and when.
+model Addendum {
+  id          String   @id @default(cuid())
+  tenderId    String
+  tender      Tender   @relation(fields: [tenderId], references: [id])
+  number      Int // 1, 2, 3… per tender
+  title       String
+  description String
+  /// Optional revised submission deadline introduced by this addendum.
+  newSubmissionDeadline DateTime?
+  issuedById  String
+  issuedAt    DateTime @default(now())
+
+  @@unique([tenderId, number])
+  @@index([tenderId])
+}
+
+// Swiss Challenge: an unsolicited proposal is published and third parties may
+// counter-bid within a window (spec §3, §5).
+model SwissChallenge {
+  id            String          @id @default(cuid())
+  tenderId      String          @unique
+  tender        Tender          @relation(fields: [tenderId], references: [id])
+  originatorId  String
+  originator    User            @relation("ChallengeOriginator", fields: [originatorId], references: [id])
+  status        ChallengeStatus @default(OPEN)
+  /// Days third parties have to submit a counter-proposal.
+  challengeWindowDays Int       @default(30)
+  challengeDeadline   DateTime
+  /// Right of the originator to match a superior counter-proposal.
+  originatorMayMatch  Boolean   @default(true)
+  outcomeNotes  String?
+  decidedAt     DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([originatorId])
 }
 
 // A bidder's response to a tender (spec §13). Technical and financial content

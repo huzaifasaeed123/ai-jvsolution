@@ -28,6 +28,7 @@ import { StatsModule } from './modules/stats/stats.module';
 import { StructuresModule } from './modules/structures/structures.module';
 import { TendersModule } from './modules/tenders/tenders.module';
 import { BidsModule } from './modules/bids/bids.module';
+import { ClarificationsModule } from './modules/clarifications/clarifications.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { BidsModule } from './modules/bids/bids.module';
     StructuresModule,
     TendersModule,
     BidsModule,
+    ClarificationsModule,
     OpportunitiesModule,
     MatchingModule,
     MandatesModule,
