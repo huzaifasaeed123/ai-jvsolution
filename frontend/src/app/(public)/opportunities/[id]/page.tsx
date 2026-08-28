@@ -174,57 +174,106 @@ export default async function OpportunityDetailPage({
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <Link href="/opportunities" className="text-sm text-muted hover:text-foreground">
-        ← All opportunities
-      </Link>
+      {/* Breadcrumb — where you are, and the way back */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
+        <Link
+          href="/opportunities"
+          className="-ml-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Opportunities
+        </Link>
+        <span aria-hidden className="text-muted/40">/</span>
+        <span className="font-mono text-xs text-muted">{o.reference}</span>
+      </nav>
 
-      {/* Hero */}
-      <div className="card mt-4 overflow-hidden">
-        {o.coverImageUrl && (
-          <CoverImage
-            src={o.coverImageUrl}
-            alt={o.title}
-            seed={o.reference}
-            sizes="(max-width: 1024px) 100vw, 1024px"
-            priority
-            className="aspect-[21/9]"
-          />
-        )}
-        <div className="p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
+      {/* Hero — banner is capped so the page opens on content, not a wall of image */}
+      <div className="card mt-3 overflow-hidden">
+        {o.coverImageUrl ? (
+          <div className="relative">
+            <CoverImage
+              src={o.coverImageUrl}
+              alt={o.title}
+              seed={o.reference}
+              sizes="(max-width: 1024px) 100vw, 1024px"
+              priority
+              ratio="21 / 9"
+              className="max-h-[300px]"
+            />
+            {/* Scrim keeps the overlaid text legible whatever the photo does */}
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/5"
+            />
+            <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-md bg-white/15 px-2 py-0.5 text-[11px] font-medium text-white ring-1 ring-inset ring-white/25 backdrop-blur-sm">
+                  {OWNER_CATEGORY_LABEL[o.ownerCategory]}
+                </span>
+                <span className="rounded-md bg-white/15 px-2 py-0.5 text-[11px] font-medium text-white ring-1 ring-inset ring-white/25 backdrop-blur-sm">
+                  {VERIFICATION_LABEL[o.verification]}
+                </span>
+                {o.confidentialLocked && (
+                  <span className="rounded-md bg-amber-400/25 px-2 py-0.5 text-[11px] font-medium text-amber-50 ring-1 ring-inset ring-amber-200/40 backdrop-blur-sm">
+                    Confidential
+                  </span>
+                )}
+              </div>
+              <h1 className="mt-2 max-w-3xl text-balance text-2xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-3xl">
+                {o.title}
+              </h1>
+              <p className="mt-1 text-sm text-white/80">
+                {sectorLabels[o.sector] ?? o.sector}
+                {o.city ? ` · ${o.city}` : ''} · {o.region ? `${o.region} · ` : ''}
+                {o.countryCode}
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* No photo — the same information, without pretending there is a banner */
+          <div className="border-b border-border p-6 pb-5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-xs text-muted">{o.reference}</span>
               <Badge tone="neutral">{OWNER_CATEGORY_LABEL[o.ownerCategory]}</Badge>
               <Badge tone="primary">{VERIFICATION_LABEL[o.verification]}</Badge>
               {o.confidentialLocked && <Badge tone="warning">🔒 Confidential</Badge>}
             </div>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight">{o.title}</h1>
+            <h1 className="mt-2 text-balance text-3xl font-semibold tracking-tight">{o.title}</h1>
             <p className="mt-1 text-muted">
               {sectorLabels[o.sector] ?? o.sector}
               {o.city ? ` · ${o.city}` : ''} · {o.region ? `${o.region} · ` : ''}
               {o.countryCode}
             </p>
           </div>
+        )}
 
-          {(isOwner || !o.confidentialLocked) && (
-            <Link href={`/opportunities/${o.id}/dashboard`} className="btn btn-primary shrink-0">
-              📊 Investor dashboard
-            </Link>
-          )}
-        </div>
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            {o.summary ? (
+              <p className="max-w-2xl text-foreground/80">{o.summary}</p>
+            ) : (
+              <span />
+            )}
+            {(isOwner || !o.confidentialLocked) && (
+              <Link
+                href={`/opportunities/${o.id}/dashboard`}
+                className="btn btn-primary shrink-0"
+              >
+                Investor dashboard
+              </Link>
+            )}
+          </div>
 
-        {o.summary && <p className="mt-4 max-w-3xl text-foreground/80">{o.summary}</p>}
+          {/* Key figures at a glance */}
+          <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
+            <Field label="GDV" value={formatMoney(o.projectValue, o.currency)} />
+            <Field label="Investment" value={formatMoney(o.investmentRequired, o.currency)} />
+            <Field label="Target IRR" value={o.targetIrr ? `${o.targetIrr}%` : '—'} />
+            <Field label="Land area" value={formatNumber(o.landAreaSqm, ' m²')} />
+          </div>
 
-        {/* Key figures at a glance */}
-        <div className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-4">
-          <Field label="GDV" value={formatMoney(o.projectValue, o.currency)} />
-          <Field label="Investment" value={formatMoney(o.investmentRequired, o.currency)} />
-          <Field label="Target IRR" value={o.targetIrr ? `${o.targetIrr}%` : '—'} />
-          <Field label="Land area" value={formatNumber(o.landAreaSqm, ' m²')} />
-        </div>
-
-        <Gallery urls={o.galleryUrls ?? []} alt={o.title} />
+          <Gallery urls={o.galleryUrls ?? []} alt={o.title} />
         </div>
       </div>
 

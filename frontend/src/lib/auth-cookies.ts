@@ -13,7 +13,10 @@ export const accessCookieOptions = {
   secure: isProd,
   sameSite: 'lax' as const,
   path: '/',
-  maxAge: 60 * 60, // 1h (access token itself expires sooner; refresh renews)
+  // Matched to the API's JWT_ACCESS_TTL so the cookie's presence tracks the
+  // token's validity. Middleware renews it from the refresh cookie before it
+  // lapses, so the session still lasts as long as the refresh token does.
+  maxAge: 15 * 60,
 };
 
 export const refreshCookieOptions = {

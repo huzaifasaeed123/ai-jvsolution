@@ -25,7 +25,12 @@ function initials(name: string): string {
 }
 
 /**
- * 16:9 cover for an opportunity or tender. `priority` for above-the-fold heroes.
+ * Cover image for an opportunity or tender.
+ *
+ * The aspect ratio is applied as an inline style rather than a utility class:
+ * a caller passing its own aspect class through `className` would otherwise
+ * collide with the default one and the winner would depend on stylesheet order.
+ * Pair `ratio` with a max-height in `className` to cap a wide banner.
  */
 export function CoverImage({
   src,
@@ -34,6 +39,7 @@ export function CoverImage({
   className = '',
   sizes = '(max-width: 768px) 100vw, 33vw',
   priority = false,
+  ratio = '16 / 9',
 }: {
   src?: string | null;
   alt: string;
@@ -41,10 +47,15 @@ export function CoverImage({
   className?: string;
   sizes?: string;
   priority?: boolean;
+  /** CSS aspect-ratio, e.g. '16 / 9' or '21 / 9'. */
+  ratio?: string;
 }) {
   const h = hue(seed ?? alt);
   return (
-    <div className={`relative aspect-video overflow-hidden bg-foreground/5 ${className}`}>
+    <div
+      className={`relative overflow-hidden bg-foreground/5 ${className}`}
+      style={{ aspectRatio: ratio }}
+    >
       {src ? (
         <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
       ) : (
