@@ -17,6 +17,7 @@ import {
   IconBranch,
   IconInbox,
   IconUsers,
+  IconGavel,
 } from '@/components/ui/icons';
 import type { ReactNode } from 'react';
 
@@ -47,6 +48,7 @@ const GROUPS: NavGroup[] = [
       { href: '/dashboard/opportunities', label: 'My opportunities', icon: <IconBuilding />, roles: ['OWNER', 'GOVERNMENT', 'ADMIN'] },
       { href: '/dashboard/mandates', label: 'My mandates', icon: <IconTarget />, roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'] },
       { href: '/dashboard/offers', label: 'My offers', icon: <IconInbox />, roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'] },
+      { href: '/dashboard/bids', label: 'My bids', icon: <IconGavel />, roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'] },
       { href: '/dashboard/consortiums', label: 'Consortiums', icon: <IconUsers />, roles: ['DEVELOPER', 'INVESTOR', 'ADMIN'] },
       { href: '/dashboard/requests', label: 'Access requests', icon: <IconKey /> },
     ],

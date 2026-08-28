@@ -142,6 +142,17 @@ export function IconUsers(p: SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconGavel(p: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M4 20h9" />
+      <path d="m9.5 14.5 5-5" />
+      <rect x="11.5" y="4.5" width="7" height="4" rx="1" transform="rotate(45 15 6.5)" />
+      <path d="m6 12 4-4" />
+    </svg>
+  );
+}
+
 export function IconSpark(p: SVGProps<SVGSVGElement>) {
   return (
     <svg {...base} {...p}>
