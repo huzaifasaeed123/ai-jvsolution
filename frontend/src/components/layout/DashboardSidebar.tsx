@@ -104,7 +104,7 @@ export function DashboardSidebar({
                   }`}
                 >
                   {active && (
-                    <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-primary" />
+                    <span className="absolute start-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-e bg-primary" />
                   )}
                   <span className={active ? 'text-primary' : 'text-muted'}>{item.icon}</span>
                   {item.label}

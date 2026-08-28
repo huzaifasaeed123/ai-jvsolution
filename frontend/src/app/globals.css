@@ -72,6 +72,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* RTL support (spec §38): mirror the few directional affordances. Layout uses
+   flex/grid, which mirrors automatically; these handle the exceptions. */
+[dir='rtl'] .rtl-flip {
+  transform: scaleX(-1);
+}
+[dir='rtl'] blockquote,
+[dir='rtl'] ul,
+[dir='rtl'] ol {
+  text-align: right;
+}
+
 ::selection {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
 }

@@ -2,16 +2,19 @@ import Link from 'next/link';
 import { config } from '@/lib/config';
 import { getCurrentUser } from '@/lib/session';
 import { LogoutButton } from '@/features/auth/LogoutButton';
+import { getTranslator } from '@/i18n/server';
+import { LocaleSwitcher } from './LocaleSwitcher';
+import type { MessageKey } from '@/i18n/messages';
 
-const NAV = [
-  { href: '/how-it-works', label: 'How it works' },
-  { href: '/opportunities', label: 'Opportunities' },
-  { href: '/countries', label: 'Country intelligence' },
-  { href: '/structures', label: 'Structures' },
+const NAV: { href: string; key: MessageKey }[] = [
+  { href: '/how-it-works', key: 'nav.howItWorks' },
+  { href: '/opportunities', key: 'nav.opportunities' },
+  { href: '/countries', key: 'nav.countries' },
+  { href: '/structures', key: 'nav.structures' },
 ];
 
 export async function Header() {
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getTranslator()]);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface/80 backdrop-blur">
@@ -26,26 +29,27 @@ export async function Header() {
         <nav className="hidden items-center gap-6 text-sm text-muted md:flex">
           {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="transition-colors hover:text-foreground">
-              {item.label}
+              {t(item.key)}
             </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-3 text-sm">
+          <LocaleSwitcher current={t.locale} label={t('common.language')} />
           {user ? (
             <>
               <Link href="/dashboard" className="font-medium text-foreground/80 hover:text-foreground">
-                Dashboard
+                {t('nav.dashboard')}
               </Link>
               <LogoutButton />
             </>
           ) : (
             <>
               <Link href="/login" className="font-medium text-foreground/80 hover:text-foreground">
-                Sign in
+                {t('nav.signIn')}
               </Link>
               <Link href="/register" className="btn btn-primary">
-                Join
+                {t('nav.join')}
               </Link>
             </>
           )}
