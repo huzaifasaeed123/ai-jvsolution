@@ -173,7 +173,7 @@ export default async function OpportunityDetailPage({
   ];
 
   return (
-    <article className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
+    <article className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-6 lg:px-8">
       {/* Breadcrumb — where you are, and the way back */}
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
         <Link

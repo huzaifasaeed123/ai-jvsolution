@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { listPublicTenders } from '@/features/tenders/api';
 import { TenderCard } from '@/features/tenders/components/TenderCard';
 import { COUNTRIES } from '@/features/auth/constants';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export const metadata = {
   title: 'Tender notices',
@@ -24,12 +25,12 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
   const countriesWithTenders = [...new Set(tenders.map((t) => t.opportunity.countryCode))];
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h1 className="text-4xl font-semibold tracking-tight">Tender notices</h1>
-      <p className="mt-3 max-w-2xl text-lg text-muted">
-        Open procurement from government and semi-government authorities. Every notice publishes its
-        requirements, risk allocation and evaluation criteria up front.
-      </p>
+    <section className="container-page py-12 sm:py-16">
+      <PageHeader
+        eyebrow="Public procurement"
+        title="Tender notices"
+        lede="Open procurement from government and semi-government authorities. Every notice publishes its requirements, risk allocation and evaluation criteria up front — before a single bid is opened."
+      />
 
       {/* Country filter */}
       {countriesWithTenders.length > 1 && (
@@ -53,8 +54,8 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
       )}
 
       {tenders.length === 0 ? (
-        <div className="card mt-10 p-12 text-center">
-          <p className="font-medium">No tender notices published yet</p>
+        <div className="mt-10 rounded-[var(--radius-card)] border border-dashed border-border-strong px-6 py-16 text-center">
+          <p className="display text-lg">No tender notices published yet</p>
           <p className="mt-1 text-sm text-muted">
             Government and semi-government authorities publish procurement here.
           </p>
@@ -62,13 +63,17 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
       ) : (
         <>
           <div className="mt-10">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-              Open for bids ({open.length})
-            </h2>
+            <div className="flex items-center gap-4">
+              <h2 className="eyebrow shrink-0" style={{ color: 'var(--success)' }}>
+                Open for bids
+              </h2>
+              <span aria-hidden className="h-px flex-1 bg-border" />
+              <span className="shrink-0 font-mono text-[11px] text-muted">{open.length}</span>
+            </div>
             {open.length === 0 ? (
               <p className="mt-3 text-sm text-muted">No tenders are currently accepting bids.</p>
             ) : (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {open.map((t) => (
                   <TenderCard key={t.id} tender={t} />
                 ))}
@@ -77,11 +82,13 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
           </div>
 
           {closed.length > 0 && (
-            <div className="mt-12">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-                Closed &amp; in progress ({closed.length})
-              </h2>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-14">
+              <div className="flex items-center gap-4">
+                <h2 className="eyebrow shrink-0 text-muted">Closed &amp; in progress</h2>
+                <span aria-hidden className="h-px flex-1 bg-border" />
+                <span className="shrink-0 font-mono text-[11px] text-muted">{closed.length}</span>
+              </div>
+              <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {closed.map((t) => (
                   <TenderCard key={t.id} tender={t} />
                 ))}

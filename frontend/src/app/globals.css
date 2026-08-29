@@ -61,6 +61,7 @@
   --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-serif);
   --radius-card: 0.875rem;
 }
 
@@ -89,6 +90,41 @@ body {
 
 /* Reusable component classes (used across pages) */
 @layer components {
+  /* Display type — headlines and headline figures. */
+  .display {
+    font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+    font-weight: 600;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+  }
+  /* Small uppercase label above a heading. */
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  /* Figures that line up in columns or sit beside each other. */
+  .figure {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  /* Page gutter — one definition so every section lines up. */
+  .container-page {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .container-page { padding-inline: 1.5rem; }
+  }
+  @media (min-width: 1024px) {
+    .container-page { padding-inline: 2rem; }
+  }
   .card {
     background: var(--surface);
     border: 1px solid var(--border);

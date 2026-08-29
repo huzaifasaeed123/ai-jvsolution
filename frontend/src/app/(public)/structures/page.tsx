@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getStructureLibrary } from '@/features/structures/api';
 import { Badge } from '@/components/ui/Badge';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export const metadata = {
   title: 'Partnership structures',
@@ -29,20 +30,28 @@ export default async function StructuresPage() {
   }
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h1 className="text-4xl font-semibold tracking-tight">Partnership structures</h1>
-      <p className="mt-3 max-w-2xl text-lg text-muted">
-        There is rarely one right way to structure a venture. These are the formulas in common use —
-        what the owner receives, who carries the risk, and when each tends to fit.
-      </p>
-      <p className="mt-3 text-sm text-muted">
-        {library.documented} explained · {library.totalSupported} supported across the platform
-      </p>
+    <section className="container-page py-12 sm:py-16">
+      <PageHeader
+        eyebrow="Structure library"
+        title="Partnership structures"
+        lede="There is rarely one right way to structure a venture. These are the formulas in common use — what the owner receives, who carries the risk, and when each tends to fit."
+        actions={
+          <div className="text-right">
+            <p className="figure text-[2rem] leading-none">{library.totalSupported}</p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.1em] text-muted">
+              structures supported
+            </p>
+            <p className="mt-0.5 font-mono text-[11px] text-muted">
+              {library.documented} explained
+            </p>
+          </div>
+        }
+      />
 
       {library.groups.map((g) => (
         <div key={g.code} className="mt-14">
-          <h2 className="text-2xl font-semibold tracking-tight">{g.label}</h2>
-          <p className="mt-1 text-muted">{g.blurb}</p>
+          <h2 className="display text-2xl">{g.label}</h2>
+          <p className="mt-1.5 max-w-2xl leading-relaxed text-muted">{g.blurb}</p>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             {g.entries.map((s) => (

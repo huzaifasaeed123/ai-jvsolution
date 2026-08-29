@@ -66,7 +66,7 @@ function Journey({
   return (
     <div className="card p-8">
       <span className={`grid h-11 w-11 place-items-center rounded-xl ${tone}`}>{icon}</span>
-      <h2 className="mt-4 text-xl font-semibold">{title}</h2>
+      <h2 className="display mt-4 text-xl">{title}</h2>
       <ol className="mt-5 space-y-5">
         {steps.map((s, i) => (
           <li key={s.title} className="flex gap-4">
@@ -88,13 +88,26 @@ function Journey({
 export default function HowItWorksPage() {
   return (
     <>
-      <section className="border-b border-border bg-primary/[0.05]">
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
-          <Badge tone="accent">How it works</Badge>
-          <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+      <section className="relative overflow-hidden border-b border-border">
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-primary/[0.04]" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.5]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            maskImage: 'radial-gradient(ellipse 70% 60% at 30% 0%, #000 40%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 70% 60% at 30% 0%, #000 40%, transparent 100%)',
+          }}
+        />
+        <div className="container-page relative py-16 sm:py-20">
+          <p className="eyebrow">How it works</p>
+          <h1 className="display mt-4 max-w-3xl text-[2.25rem] leading-[1.08] sm:text-[3rem]">
             Built for the deal that needs both sides at the table
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-muted">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
             Marketplaces list assets. Prospecting tools chase owners. {config.brandName} treats both
             sides of a venture as first-class participants — with controlled disclosure between them.
           </p>
@@ -102,7 +115,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Journeys */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section className="container-page py-16 sm:py-20">
         <div className="grid gap-6 md:grid-cols-2">
           <Journey
             icon={<IconBuilding />}
@@ -125,7 +138,7 @@ export default function HowItWorksPage() {
 
       {/* Controlled disclosure */}
       <section className="border-y border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="container-page py-16 sm:py-20">
           <h2 className="text-2xl font-semibold tracking-tight">Controlled disclosure, step by step</h2>
           <p className="mt-2 max-w-2xl text-muted">
             The sensitive parts of a deal open only as trust is established — and every step leaves a record.
@@ -148,7 +161,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Tools */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section className="container-page py-16 sm:py-20">
         <h2 className="text-2xl font-semibold tracking-tight">Analysis built in</h2>
         <p className="mt-2 max-w-2xl text-muted">
           Model the deal without leaving the platform. Every run stores its inputs and assumptions,
@@ -172,7 +185,7 @@ export default function HowItWorksPage() {
 
       {/* Trust */}
       <section className="border-t border-border bg-surface">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="container-page py-16 sm:py-20">
           <h2 className="text-2xl font-semibold tracking-tight">Why parties trust the process</h2>
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {TRUST.map((t) => (
@@ -191,7 +204,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section className="container-page py-16 sm:py-20">
         <div className="card flex flex-col items-center justify-between gap-4 p-8 text-center sm:flex-row sm:text-left">
           <div>
             <h3 className="text-xl font-semibold">Start with either side of the table</h3>

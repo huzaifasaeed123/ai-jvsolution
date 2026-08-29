@@ -9,7 +9,7 @@ export default async function InvestorDashboardPage({ params }: { params: Promis
   const data = await getInvestorDashboard(id);
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <section className="container-page py-10 sm:py-12">
       <Link href={`/opportunities/${id}`} className="text-sm text-muted hover:text-foreground">
         ← Back to opportunity
       </Link>

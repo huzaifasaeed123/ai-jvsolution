@@ -17,6 +17,7 @@ const en = {
   'nav.signIn': 'Sign in',
   'nav.join': 'Join',
   'nav.signOut': 'Sign out',
+  'nav.menu': 'Menu',
 
   'home.badge': 'Two-sided JV, PPP & concession platform',
   'home.ctaOwner': 'I own land or assets',
