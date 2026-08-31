@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /**
- * Small-screen navigation. The desktop bar hides its links below `md`, so
- * without this a phone had no way to reach any section of the site.
+ * Navigation below the `lg` breakpoint. The desktop bar hides its links there,
+ * so without this a phone — and every tablet-width window — had no way to reach
+ * any section of the site. The trigger's breakpoint must stay in step with the
+ * desktop nav's, or a width opens up with neither showing.
  */
 export function MobileNav({
   items,
@@ -43,7 +45,7 @@ export function MobileNav({
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         onClick={() => setOpen(true)}
