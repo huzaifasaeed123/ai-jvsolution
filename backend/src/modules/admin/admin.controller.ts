@@ -1,0 +1,79 @@
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import type { AuthUser } from '../../common/decorators/current-user.decorator';
+import { AdminUsersService } from './admin-users.service';
+import { QueryUsersDto } from './dto/query-users.dto';
+import { SetRoleDto, SetAccessLevelDto, ReasonDto } from './dto/admin-actions.dto';
+
+/**
+ * Platform back-office. @Roles is applied at the class level so a route added
+ * here cannot accidentally ship without the admin gate.
+ */
+@ApiTags('admin')
+@ApiBearerAuth()
+@Roles(Role.ADMIN)
+@Controller('admin')
+export class AdminController {
+  constructor(private readonly users: AdminUsersService) {}
+
+  @Get('overview')
+  @ApiOperation({ summary: 'Headline platform counts' })
+  overview() {
+    return this.users.overview();
+  }
+
+  @Get('users')
+  @ApiOperation({ summary: 'Search and filter the user directory' })
+  listUsers(@Query() query: QueryUsersDto) {
+    return this.users.list(query);
+  }
+
+  @Get('users/:id')
+  @ApiOperation({ summary: 'Get one user' })
+  getUser(@Param('id') id: string) {
+    return this.users.get(id);
+  }
+
+  @Patch('users/:id/role')
+  @ApiOperation({ summary: 'Change a user role' })
+  setRole(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: SetRoleDto) {
+    return this.users.setRole(actor, id, dto.role);
+  }
+
+  @Patch('users/:id/access-level')
+  @ApiOperation({ summary: 'Change a user access level' })
+  setAccessLevel(
+    @CurrentUser() actor: AuthUser,
+    @Param('id') id: string,
+    @Body() dto: SetAccessLevelDto,
+  ) {
+    return this.users.setAccessLevel(actor, id, dto.accessLevel);
+  }
+
+  @Post('users/:id/suspend')
+  @ApiOperation({ summary: 'Suspend an account (revokes its sessions)' })
+  suspend(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: ReasonDto) {
+    return this.users.suspend(actor, id, dto.reason);
+  }
+
+  @Post('users/:id/reinstate')
+  @ApiOperation({ summary: 'Lift a suspension' })
+  reinstate(@CurrentUser() actor: AuthUser, @Param('id') id: string) {
+    return this.users.reinstate(actor, id);
+  }
+
+  @Post('users/:id/sign-out')
+  @ApiOperation({ summary: 'Revoke every session for a user' })
+  signOut(@CurrentUser() actor: AuthUser, @Param('id') id: string) {
+    return this.users.forceSignOut(actor, id);
+  }
+
+  @Post('users/:id/delete')
+  @ApiOperation({ summary: 'Soft-delete an account, preserving its audit trail' })
+  softDelete(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: ReasonDto) {
+    return this.users.softDelete(actor, id, dto.reason);
+  }
+}

@@ -23,6 +23,12 @@ enum Role {
   ADMIN
 }
 
+/// Account lifecycle. A suspended user keeps their data but cannot authenticate.
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
 enum AccessLevel {
   PUBLIC
   REGISTERED
@@ -209,6 +215,19 @@ model User {
   country      String?
   /// Public profile image. External URL in dev/demo; object-storage key in prod.
   avatarUrl    String?
+
+  // --- Account lifecycle & moderation (admin back-office) ---
+  status          UserStatus @default(ACTIVE)
+  suspendedAt     DateTime?
+  suspendedReason String?
+  suspendedById   String?
+  /// Bumped to invalidate every token already issued to this user. Checked on
+  /// each request, which is what makes sign-out and suspension take effect
+  /// immediately rather than whenever the access token happens to expire.
+  tokenVersion    Int        @default(0)
+  lastLoginAt     DateTime?
+  deletedAt       DateTime?
+
   companyId    String?
   company      Company?      @relation(fields: [companyId], references: [id])
   opportunities Opportunity[]
@@ -225,6 +244,7 @@ model User {
   updatedAt    DateTime      @updatedAt
 
   @@index([role])
+  @@index([status])
 }
 
 // ============================================================

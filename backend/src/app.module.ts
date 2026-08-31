@@ -5,6 +5,7 @@ import { validateEnv } from './config/env.validation';
 import { PrismaModule } from './prisma/prisma.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { UsersModule } from './modules/users/users.module';
 import { OpportunitiesModule } from './modules/opportunities/opportunities.module';
 import { ReferenceModule } from './modules/reference/reference.module';
@@ -41,6 +42,7 @@ import { ClarificationsModule } from './modules/clarifications/clarifications.mo
     HealthModule,
     UsersModule,
     AuthModule,
+    AdminModule,
     ReferenceModule,
     StorageModule,
     AccessModule,

@@ -4,7 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
-import { Role, AccessLevel, User } from '@prisma/client';
+import { UsersRepository } from '../users/users.repository';
+import { Role, AccessLevel, User, UserStatus } from '@prisma/client';
 
 /** Minimal fake user row. */
 function makeUser(overrides: Partial<User> = {}): User {
@@ -17,6 +18,13 @@ function makeUser(overrides: Partial<User> = {}): User {
     accessLevel: AccessLevel.REGISTERED,
     country: 'AE',
     avatarUrl: null,
+    status: UserStatus.ACTIVE,
+    suspendedAt: null,
+    suspendedReason: null,
+    suspendedById: null,
+    tokenVersion: 0,
+    lastLoginAt: null,
+    deletedAt: null,
     companyId: null,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -27,6 +35,7 @@ function makeUser(overrides: Partial<User> = {}): User {
 describe('AuthService', () => {
   let service: AuthService;
   let users: jest.Mocked<Pick<UsersService, 'findByEmail' | 'findById' | 'create'>>;
+  let usersRepo: { update: jest.Mock };
 
   beforeEach(() => {
     users = {
@@ -36,7 +45,15 @@ describe('AuthService', () => {
     };
     const jwt = { signAsync: jest.fn().mockResolvedValue('signed.jwt.token') } as unknown as JwtService;
     const config = { get: jest.fn().mockReturnValue('secret') } as unknown as ConfigService;
-    service = new AuthService(users as unknown as UsersService, jwt, config);
+    // Login stamps lastLoginAt through the repository and builds the result
+    // from the row it returns, so the fake echoes the user back.
+    usersRepo = { update: jest.fn().mockImplementation((id: string) => makeUser({ id })) };
+    service = new AuthService(
+      users as unknown as UsersService,
+      usersRepo as unknown as UsersRepository,
+      jwt,
+      config,
+    );
   });
 
   it('rejects registration when the email already exists', async () => {
