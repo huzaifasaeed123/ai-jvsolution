@@ -5,8 +5,10 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthUser } from '../../common/decorators/current-user.decorator';
 import { AdminUsersService } from './admin-users.service';
+import { AdminContentService } from './admin-content.service';
 import { QueryUsersDto } from './dto/query-users.dto';
 import { SetRoleDto, SetAccessLevelDto, ReasonDto } from './dto/admin-actions.dto';
+import { QueryOpportunitiesDto, QueryTendersDto } from './dto/query-content.dto';
 
 /**
  * Platform back-office. @Roles is applied at the class level so a route added
@@ -17,12 +19,16 @@ import { SetRoleDto, SetAccessLevelDto, ReasonDto } from './dto/admin-actions.dt
 @Roles(Role.ADMIN)
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly users: AdminUsersService) {}
+  constructor(
+    private readonly users: AdminUsersService,
+    private readonly content: AdminContentService,
+  ) {}
 
   @Get('overview')
   @ApiOperation({ summary: 'Headline platform counts' })
-  overview() {
-    return this.users.overview();
+  async overview() {
+    const [users, content] = await Promise.all([this.users.overview(), this.content.counts()]);
+    return { users, ...content };
   }
 
   @Get('users')
@@ -75,5 +81,49 @@ export class AdminController {
   @ApiOperation({ summary: 'Soft-delete an account, preserving its audit trail' })
   softDelete(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: ReasonDto) {
     return this.users.softDelete(actor, id, dto.reason);
+  }
+
+  // ------------------------------------------------------------- moderation
+
+  @Get('opportunities')
+  @ApiOperation({ summary: 'Every listing, including drafts and archived' })
+  listOpportunities(@Query() query: QueryOpportunitiesDto) {
+    return this.content.listOpportunities(query);
+  }
+
+  @Get('opportunities/:id')
+  @ApiOperation({ summary: 'One listing, whatever its status' })
+  getOpportunity(@Param('id') id: string) {
+    return this.content.getOpportunity(id);
+  }
+
+  @Post('opportunities/:id/unpublish')
+  @ApiOperation({ summary: 'Take a listing off the market, back to draft' })
+  unpublish(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: ReasonDto) {
+    return this.content.unpublish(actor, id, dto.reason);
+  }
+
+  @Post('opportunities/:id/archive')
+  @ApiOperation({ summary: 'Retire a listing' })
+  archive(@CurrentUser() actor: AuthUser, @Param('id') id: string, @Body() dto: ReasonDto) {
+    return this.content.archive(actor, id, dto.reason);
+  }
+
+  @Post('opportunities/:id/restore')
+  @ApiOperation({ summary: 'Undo a takedown — returns the listing to draft' })
+  restore(@CurrentUser() actor: AuthUser, @Param('id') id: string) {
+    return this.content.restore(actor, id);
+  }
+
+  @Get('verification-queue')
+  @ApiOperation({ summary: 'Listings awaiting or needing verification review' })
+  verificationQueue() {
+    return this.content.verificationQueue();
+  }
+
+  @Get('tenders')
+  @ApiOperation({ summary: 'Every tender, with stalled procurements flagged' })
+  listTenders(@Query() query: QueryTendersDto) {
+    return this.content.listTenders(query);
   }
 }
