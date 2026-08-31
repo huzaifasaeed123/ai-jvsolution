@@ -11,9 +11,11 @@ export const metadata = {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="mt-2">
-      <p className="text-[11px] uppercase tracking-wide text-muted">{label}</p>
-      <p className="text-sm text-foreground/80">{value}</p>
+    <div className="grid grid-cols-[104px_minmax(0,1fr)] gap-3 py-2">
+      <dt className="text-[10px] uppercase leading-relaxed tracking-[0.09em] text-muted">
+        {label}
+      </dt>
+      <dd className="text-sm leading-relaxed text-foreground/80">{value}</dd>
     </div>
   );
 }
@@ -50,42 +52,58 @@ export default async function StructuresPage() {
 
       {library.groups.map((g) => (
         <div key={g.code} className="mt-14">
-          <h2 className="display text-2xl">{g.label}</h2>
-          <p className="mt-1.5 max-w-2xl leading-relaxed text-muted">{g.blurb}</p>
+          <div className="flex items-center gap-4">
+            <h2 className="display shrink-0 text-2xl">{g.label}</h2>
+            <span aria-hidden className="h-px flex-1 bg-border" />
+            <span className="shrink-0 font-mono text-[11px] text-muted">
+              {g.entries.length}
+            </span>
+          </div>
+          <p className="mt-2 max-w-2xl leading-relaxed text-muted">{g.blurb}</p>
 
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-5 md:grid-cols-2">
             {g.entries.map((s) => (
-              <div key={s.code} className="card p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-lg font-semibold">{s.label}</h3>
-                  <Badge tone="neutral">{s.code}</Badge>
+              <article
+                key={s.code}
+                className="card flex flex-col p-5 transition-shadow duration-300 hover:shadow-[var(--shadow-md)]"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="display text-[1.0625rem] leading-snug">{s.label}</h3>
+                  <span className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted">
+                    {s.code}
+                  </span>
                 </div>
-                <p className="mt-2 text-sm text-foreground/80">{s.mechanism}</p>
-                <div className="mt-3 border-t border-border pt-2">
-                  <Row label="Owner receives" value={s.ownerReceives} />
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">{s.mechanism}</p>
+                <div className="flex-1" />
+                <dl className="mt-3 divide-y divide-border border-t border-border">
+                  <Row label="Owner gets" value={s.ownerReceives} />
                   <Row label="Risk" value={s.riskProfile} />
                   <Row label="Best for" value={s.bestFor} />
-                </div>
-              </div>
+                </dl>
+              </article>
             ))}
           </div>
         </div>
       ))}
 
       {/* CTA */}
-      <div className="card mt-16 flex flex-col items-center justify-between gap-4 p-8 text-center sm:flex-row sm:text-left">
+      <div className="mt-16 flex flex-col items-start justify-between gap-5 rounded-[var(--radius-card)] bg-primary p-8 text-primary-foreground sm:flex-row sm:items-center">
         <div>
-          <h3 className="text-xl font-semibold">Not sure which structure fits?</h3>
-          <p className="mt-1 text-muted">
-            Describe your opportunity and our recommender ranks the formulas with reasons for each.
+          <h3 className="display text-xl">Not sure which structure fits?</h3>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed opacity-80">
+            Describe your opportunity and the recommender ranks the formulas against it, with a
+            stated reason for each placement.
           </p>
         </div>
-        <Link href="/register" className="btn btn-primary px-6 py-3 text-base">
+        <Link
+          href="/register"
+          className="btn shrink-0 bg-[var(--primary-foreground)] px-6 py-3 text-base text-[var(--primary)] hover:opacity-90"
+        >
           Try the recommender
         </Link>
       </div>
 
-      <p className="mt-8 text-xs text-muted">
+      <p className="mt-8 border-t border-border pt-5 text-xs leading-relaxed text-muted">
         Educational summaries only — not legal, tax or investment advice. Structures vary by
         jurisdiction; verify with qualified local advisors.
       </p>

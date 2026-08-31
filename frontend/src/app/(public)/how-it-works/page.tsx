@@ -64,7 +64,7 @@ function Journey({
   tone: string;
 }) {
   return (
-    <div className="card p-8">
+    <div className="card p-7 sm:p-8">
       <span className={`grid h-11 w-11 place-items-center rounded-xl ${tone}`}>{icon}</span>
       <h2 className="display mt-4 text-xl">{title}</h2>
       <ol className="mt-5 space-y-5">
@@ -139,8 +139,9 @@ export default function HowItWorksPage() {
       {/* Controlled disclosure */}
       <section className="border-y border-border bg-surface">
         <div className="container-page py-16 sm:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight">Controlled disclosure, step by step</h2>
-          <p className="mt-2 max-w-2xl text-muted">
+          <p className="eyebrow">Disclosure</p>
+          <h2 className="display mt-2 text-2xl sm:text-3xl">Controlled disclosure, step by step</h2>
+          <p className="mt-3 max-w-2xl leading-relaxed text-muted">
             The sensitive parts of a deal open only as trust is established — and every step leaves a record.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -149,11 +150,17 @@ export default function HowItWorksPage() {
               { n: '02', t: 'Request', d: 'A registered party asks the owner for confidential access.' },
               { n: '03', t: 'Approve + NDA', d: 'The owner approves, the NDA is signed, and the grant is recorded.' },
               { n: '04', t: 'Disclosed', d: 'Location, identity and the data room unlock — each access audited.' },
-            ].map((s) => (
-              <div key={s.n} className="card p-5">
+            ].map((s, i, arr) => (
+              <div key={s.n} className="relative border-t-2 border-accent/30 pt-4">
+                {/* The rail thickens along the sequence: more is disclosed at each step */}
+                <span
+                  aria-hidden
+                  className="absolute -top-[2px] left-0 h-[2px] bg-accent"
+                  style={{ width: `${((i + 1) / arr.length) * 100}%` }}
+                />
                 <span className="font-mono text-xs text-accent">{s.n}</span>
-                <p className="mt-2 font-semibold">{s.t}</p>
-                <p className="mt-1 text-sm text-muted">{s.d}</p>
+                <p className="mt-1.5 font-semibold">{s.t}</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted">{s.d}</p>
               </div>
             ))}
           </div>
@@ -162,19 +169,18 @@ export default function HowItWorksPage() {
 
       {/* Tools */}
       <section className="container-page py-16 sm:py-20">
-        <h2 className="text-2xl font-semibold tracking-tight">Analysis built in</h2>
-        <p className="mt-2 max-w-2xl text-muted">
+        <p className="eyebrow">Modelling</p>
+        <h2 className="display mt-2 text-2xl sm:text-3xl">Analysis built in</h2>
+        <p className="mt-3 max-w-2xl leading-relaxed text-muted">
           Model the deal without leaving the platform. Every run stores its inputs and assumptions,
           so results are reproducible and auditable.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {TOOLS.map((t) => (
-            <div key={t.name} className="card p-6">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
-                {t.icon}
-              </span>
+            <div key={t.name} className="border-t border-border pt-5">
+              <span className="text-primary">{t.icon}</span>
               <p className="mt-3 font-semibold">{t.name}</p>
-              <p className="mt-1 text-sm text-muted">{t.desc}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">{t.desc}</p>
             </div>
           ))}
         </div>
@@ -186,16 +192,15 @@ export default function HowItWorksPage() {
       {/* Trust */}
       <section className="border-t border-border bg-surface">
         <div className="container-page py-16 sm:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight">Why parties trust the process</h2>
+          <p className="eyebrow">Assurance</p>
+          <h2 className="display mt-2 text-2xl sm:text-3xl">Why parties trust the process</h2>
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {TRUST.map((t) => (
-              <div key={t.title} className="card flex gap-4 p-6">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
-                  {t.icon}
-                </span>
+              <div key={t.title} className="flex gap-4 border-t border-border pt-5">
+                <span className="mt-0.5 shrink-0 text-primary">{t.icon}</span>
                 <div>
                   <p className="font-semibold">{t.title}</p>
-                  <p className="mt-1 text-sm text-muted">{t.desc}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">{t.desc}</p>
                 </div>
               </div>
             ))}
@@ -205,16 +210,28 @@ export default function HowItWorksPage() {
 
       {/* CTA */}
       <section className="container-page py-16 sm:py-20">
-        <div className="card flex flex-col items-center justify-between gap-4 p-8 text-center sm:flex-row sm:text-left">
+        <div className="flex flex-col items-start justify-between gap-5 rounded-[var(--radius-card)] bg-primary p-8 text-primary-foreground sm:flex-row sm:items-center">
           <div>
-            <h3 className="text-xl font-semibold">Start with either side of the table</h3>
-            <p className="mt-1 text-muted">Listing an opportunity and defining a mandate both take minutes.</p>
+            <h3 className="display text-xl">Start with either side of the table</h3>
+            <p className="mt-2 text-sm leading-relaxed opacity-80">
+              Listing an opportunity and defining a mandate both take minutes.
+            </p>
           </div>
-          <div className="flex gap-2">
-            <Link href="/opportunities" className="btn btn-outline">
+          {/* Both buttons sit on the primary ground, so neither can take its
+              colours from the page palette — btn-primary would vanish here. */}
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Link
+              href="/opportunities"
+              className="btn border border-current/35 text-[var(--primary-foreground)] hover:bg-white/10"
+            >
               <IconInbox width={16} height={16} /> Browse market
             </Link>
-            <Link href="/register" className="btn btn-primary">Create account</Link>
+            <Link
+              href="/register"
+              className="btn bg-[var(--primary-foreground)] text-[var(--primary)] hover:opacity-90"
+            >
+              Create account
+            </Link>
           </div>
         </div>
       </section>

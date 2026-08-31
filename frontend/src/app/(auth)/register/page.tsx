@@ -38,78 +38,109 @@ function RegisterForm() {
   }
 
   return (
-    <section className="card mx-auto my-16 max-w-lg p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Create your account</h1>
-      <p className="mt-1 text-sm text-foreground/60">One account. Two sides of every venture.</p>
+    <>
+      <p className="eyebrow">Create account</p>
+      <h1 className="display mt-2 text-[1.875rem] leading-tight">Join the platform</h1>
+      <p className="mt-2 text-sm text-muted">
+        One account, whichever side of the venture you sit on.
+      </p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
         {error && (
-          <p className="rounded-md bg-red-500/10 px-3 py-2 text-sm text-red-600 dark:text-red-400">
+          <p
+            role="alert"
+            className="rounded-lg border border-danger/25 bg-danger/10 px-3.5 py-2.5 text-sm text-danger"
+          >
             {error}
           </p>
         )}
 
-        <div>
-          <span className="mb-2 block text-sm font-medium">I am joining as</span>
+        <fieldset>
+          <legend className="mb-2 text-sm font-medium">I am joining as</legend>
           <div className="grid grid-cols-2 gap-2">
-            {ROLE_OPTIONS.map((opt) => (
-              <button
-                type="button"
-                key={opt.value}
-                onClick={() => setRole(opt.value)}
-                className={`rounded-md border px-3 py-2.5 text-left text-sm transition-colors ${
-                  role === opt.value
-                    ? 'border-foreground bg-foreground/5'
-                    : 'border-foreground/15 hover:border-foreground/40'
-                }`}
-              >
-                <span className="block font-medium">{opt.label}</span>
-                <span className="mt-0.5 block text-xs text-foreground/55">{opt.blurb}</span>
-              </button>
-            ))}
+            {ROLE_OPTIONS.map((opt) => {
+              const selected = role === opt.value;
+              return (
+                <button
+                  type="button"
+                  key={opt.value}
+                  onClick={() => setRole(opt.value)}
+                  aria-pressed={selected}
+                  className={`rounded-lg border p-3 text-left transition-all ${
+                    selected
+                      ? 'border-primary bg-primary/[0.07] ring-1 ring-inset ring-primary/25'
+                      : 'border-border-strong hover:border-primary/40 hover:bg-foreground/[0.02]'
+                  }`}
+                >
+                  <span
+                    className={`block text-sm font-semibold ${selected ? 'text-primary' : ''}`}
+                  >
+                    {opt.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-snug text-muted">
+                    {opt.blurb}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        </div>
+        </fieldset>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Full name</label>
+          <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium">
+            Full name
+          </label>
           <input
+            id="fullName"
+            autoComplete="name"
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground/40"
+            className="input"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Email</label>
+          <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
+            Email
+          </label>
           <input
+            id="email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground/40"
+            className="input"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Password</label>
+          <label htmlFor="password" className="mb-1.5 block text-sm font-medium">
+            Password
+          </label>
           <input
+            id="password"
             type="password"
+            autoComplete="new-password"
             required
             minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground/40"
+            className="input"
           />
-          <p className="mt-1 text-xs text-foreground/50">Minimum 8 characters.</p>
+          <p className="mt-1.5 text-xs text-muted">Minimum 8 characters.</p>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium">Country</label>
+          <label htmlFor="country" className="mb-1.5 block text-sm font-medium">
+            Country
+          </label>
           <select
+            id="country"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            className="w-full rounded-md border border-foreground/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-foreground/40"
+            className="input"
           >
             <option value="">Select a country…</option>
             {COUNTRIES.map((c) => (
@@ -120,22 +151,18 @@ function RegisterForm() {
           </select>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-foreground px-4 py-2.5 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading} className="btn btn-primary w-full py-2.5">
           {loading ? 'Creating account…' : 'Create account'}
         </button>
       </form>
 
-      <p className="mt-6 text-sm text-foreground/60">
+      <p className="mt-8 border-t border-border pt-6 text-sm text-muted">
         Already have an account?{' '}
-        <Link href="/login" className="font-medium text-foreground hover:underline">
+        <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
           Sign in
         </Link>
       </p>
-    </section>
+    </>
   );
 }
 
