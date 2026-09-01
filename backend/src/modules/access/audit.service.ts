@@ -8,9 +8,13 @@ export const AuditAction = {
   ACCESS_REJECTED: 'ACCESS_REJECTED',
   ACCESS_REVOKED: 'ACCESS_REVOKED',
   NDA_SIGNED: 'NDA_SIGNED',
+  /** @deprecated No longer written — it fired once per page view, so its
+   *  volume tracked traffic rather than activity. Kept so the explorer can
+   *  still label rows recorded before it was removed. */
   CONFIDENTIAL_VIEWED: 'CONFIDENTIAL_VIEWED',
   DOCUMENT_UPLOADED: 'DOCUMENT_UPLOADED',
   DOCUMENT_DOWNLOADED: 'DOCUMENT_DOWNLOADED',
+  /** @deprecated Declared but never written. */
   DOCUMENT_VIEWED: 'DOCUMENT_VIEWED',
   VERIFICATION_UPDATED: 'VERIFICATION_UPDATED',
   OFFER_SUBMITTED: 'OFFER_SUBMITTED',
@@ -78,6 +82,21 @@ export class AuditService {
     } catch (err) {
       this.logger.error(`Failed to write audit log (${entry.action})`, err as Error);
     }
+  }
+
+  /**
+   * Retention. The trail is evidence, not telemetry, so it is pruned on a
+   * schedule rather than capped — a procurement dispute can surface long after
+   * the award. Exposed as an admin endpoint so the deployment can cron it
+   * without this service taking on a scheduler dependency.
+   */
+  async pruneOlderThan(days: number): Promise<{ deleted: number; before: Date }> {
+    const before = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const { count } = await this.prisma.auditLog.deleteMany({
+      where: { createdAt: { lt: before } },
+    });
+    this.logger.log(`Pruned ${count} audit rows older than ${days} days`);
+    return { deleted: count, before };
   }
 
   listForOpportunity(opportunityId: string) {

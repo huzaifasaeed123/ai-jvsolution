@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -6,9 +16,15 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthUser } from '../../common/decorators/current-user.decorator';
 import { AdminUsersService } from './admin-users.service';
 import { AdminContentService } from './admin-content.service';
+import { AdminOversightService } from './admin-oversight.service';
 import { QueryUsersDto } from './dto/query-users.dto';
 import { SetRoleDto, SetAccessLevelDto, ReasonDto } from './dto/admin-actions.dto';
 import { QueryOpportunitiesDto, QueryTendersDto } from './dto/query-content.dto';
+import {
+  QueryAuditDto,
+  QueryAccessRequestsDto,
+  PruneAuditDto,
+} from './dto/query-audit.dto';
 
 /**
  * Platform back-office. @Roles is applied at the class level so a route added
@@ -22,13 +38,19 @@ export class AdminController {
   constructor(
     private readonly users: AdminUsersService,
     private readonly content: AdminContentService,
+    private readonly oversight: AdminOversightService,
   ) {}
 
   @Get('overview')
   @ApiOperation({ summary: 'Headline platform counts' })
   async overview() {
-    const [users, content] = await Promise.all([this.users.overview(), this.content.counts()]);
-    return { users, ...content };
+    const [users, content, engines, accessRequests] = await Promise.all([
+      this.users.overview(),
+      this.content.counts(),
+      this.oversight.engineRuns(),
+      this.oversight.accessRequestCounts(),
+    ]);
+    return { users, ...content, engines, accessRequests };
   }
 
   @Get('users')
@@ -125,5 +147,38 @@ export class AdminController {
   @ApiOperation({ summary: 'Every tender, with stalled procurements flagged' })
   listTenders(@Query() query: QueryTendersDto) {
     return this.content.listTenders(query);
+  }
+
+  // -------------------------------------------------------------- oversight
+
+  @Get('audit')
+  @ApiOperation({ summary: 'Activity trail, filtered by actor, action, target or date' })
+  auditTrail(@Query() query: QueryAuditDto) {
+    return this.oversight.auditTrail(query);
+  }
+
+  @Get('audit/actions')
+  @ApiOperation({ summary: 'Distinct actions present in the trail, with counts' })
+  auditActions() {
+    return this.oversight.auditActions();
+  }
+
+  @Post('audit/prune')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete trail entries older than N days (retention)' })
+  pruneAudit(@Body() dto: PruneAuditDto) {
+    return this.oversight.pruneAudit(dto.days);
+  }
+
+  @Get('metrics/growth')
+  @ApiOperation({ summary: 'Monthly signup and listing growth' })
+  growth() {
+    return this.oversight.growth();
+  }
+
+  @Get('access-requests')
+  @ApiOperation({ summary: 'Access requests platform-wide, with time pending' })
+  accessRequests(@Query() query: QueryAccessRequestsDto) {
+    return this.oversight.accessRequests(query.status, query.page, query.limit);
   }
 }

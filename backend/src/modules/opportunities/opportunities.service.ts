@@ -188,13 +188,12 @@ export class OpportunitiesService {
       throw new NotFoundException('Opportunity not found');
     }
 
-    if (viaGrant && user) {
-      await this.audit.record({
-        actorId: user.id,
-        action: AuditAction.CONFIDENTIAL_VIEWED,
-        opportunityId: found.id,
-      });
-    }
+    // No audit write here on purpose. This fires on every detail-page load for
+    // an access-granted user, so it was the one entry whose volume scaled with
+    // traffic rather than with activity. What an owner actually needs to know —
+    // who was granted access, who signed the NDA, who downloaded which document
+    // — is still recorded, and each of those is a deliberate act rather than a
+    // page view.
 
     return privileged
       ? OpportunitySerializer.toFull(found)
