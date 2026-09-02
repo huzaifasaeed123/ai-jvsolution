@@ -20,7 +20,12 @@ RUN apt-get update \
 # Dependencies first, so a source-only change does not reinstall them.
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm ci --ignore-scripts
+
+# --include=dev is deliberate. A platform that injects NODE_ENV=production into
+# the build would otherwise make npm skip devDependencies, and this build needs
+# @nestjs/cli and typescript, both of which live there. Forcing it here means
+# the image builds correctly no matter how the environment is configured.
+RUN npm ci --include=dev --ignore-scripts
 
 # Explicit, not incidental.
 RUN npx prisma generate

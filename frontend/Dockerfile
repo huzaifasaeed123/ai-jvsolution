@@ -11,7 +11,10 @@ FROM node:22-slim AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+
+# --include=dev for the same reason as the API image: `next build` needs the
+# TypeScript toolchain, which an injected NODE_ENV=production would omit.
+RUN npm ci --include=dev
 
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_SITE_URL
