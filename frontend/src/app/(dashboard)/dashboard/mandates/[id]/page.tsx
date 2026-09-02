@@ -10,12 +10,10 @@ export const metadata = { title: 'Mandate matches' };
 export default async function MandateDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  let mandate;
-  try {
-    mandate = await getMandate(id);
-  } catch {
-    notFound();
-  }
+  // getMandate degrades to null rather than throwing, so the missing case is
+  // now an explicit check instead of a catch block.
+  const mandate = await getMandate(id);
+  if (!mandate) notFound();
 
   const [matchResult, reference] = await Promise.all([
     getMandateMatches(id),

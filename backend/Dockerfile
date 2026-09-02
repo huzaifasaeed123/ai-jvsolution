@@ -34,6 +34,11 @@ COPY . .
 RUN npm run build \
  && test -f dist/main.js   # fail loudly rather than shipping an empty image
 
+# Compile the demo seed too, so it can be run in production on plain node
+# rather than shipping ts-node into the runtime image. Nothing runs it
+# automatically — seeding stays a deliberate, manual act.
+RUN npm run build:seed && test -f dist-seed/index.js
+
 # ---------- runtime ----------
 FROM node:22-slim AS runner
 WORKDIR /app
@@ -51,6 +56,7 @@ RUN npm ci --omit=dev --ignore-scripts \
  && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist-seed ./dist-seed
 
 # Do not run as root inside the container.
 RUN chown -R node:node /app

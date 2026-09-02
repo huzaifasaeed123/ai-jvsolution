@@ -36,3 +36,4 @@ coverage/
 # Data Room local file storage (dev)
 backend/.storage/
 .storage/
+backend/dist-seed/

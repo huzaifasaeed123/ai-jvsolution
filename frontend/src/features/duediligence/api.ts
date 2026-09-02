@@ -1,4 +1,5 @@
 import 'server-only';
+import { apiRead } from '@/lib/api-client';
 import { config } from '@/lib/config';
 import { getAccessToken } from '@/lib/session';
 import type { DueDiligence, DdReference } from './types';
@@ -15,7 +16,10 @@ export async function getDueDiligence(opportunityId: string): Promise<DueDiligen
 }
 
 export async function getDueDiligenceReference(): Promise<DdReference> {
-  const res = await fetch(`${config.apiUrl}/reference/due-diligence`, { next: { revalidate: 3600 } });
-  if (!res.ok) throw new Error('Failed to load due diligence reference');
-  return res.json();
+  // Labels only. Empty degrades to raw codes rather than failing the page.
+  return apiRead<DdReference>(
+    '/reference/due-diligence',
+    { categories: [], riskRatings: [], receiptStatuses: [], reviewStatuses: [], closureStatuses: [] },
+    { revalidate: 3600 },
+  );
 }

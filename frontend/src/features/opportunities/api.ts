@@ -1,5 +1,5 @@
 import 'server-only';
-import { config } from '@/lib/config';
+import { apiRead } from '@/lib/api-client';
 import { getAccessToken } from '@/lib/session';
 import type {
   Opportunity,
@@ -29,15 +29,9 @@ export async function getOpportunityReference(): Promise<OpportunityReference> {
     dataRoomReadiness: [],
     verificationTiers: [],
   };
-  try {
-    const res = await fetch(`${config.apiUrl}/reference/opportunities`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return empty;
-    return (await res.json()) as OpportunityReference;
-  } catch {
-    return empty;
-  }
+  return apiRead<OpportunityReference>('/reference/opportunities', empty, {
+    revalidate: 3600,
+  });
 }
 
 export async function listOpportunities(
@@ -47,31 +41,25 @@ export async function listOpportunities(
   for (const [k, v] of Object.entries(searchParams)) {
     if (v) qs.set(k, v);
   }
-  const res = await fetch(`${config.apiUrl}/opportunities?${qs.toString()}`, {
-    cache: 'no-store',
+  return apiRead<OpportunityListResult>(`/opportunities?${qs.toString()}`, {
+    items: [],
+    total: 0,
+    page: 1,
+    limit: 0,
+    pages: 1,
   });
-  if (!res.ok) throw new Error('Failed to load opportunities');
-  return res.json();
 }
 
+/**
+ * Passes the viewer's token when present, so an owner or access-granted user
+ * sees the confidential fields. null covers not-found, no-access and an
+ * unreachable API alike — the page renders notFound() for all three.
+ */
 export async function getOpportunity(id: string): Promise<Opportunity | null> {
   const token = await getAccessToken();
-  const res = await fetch(`${config.apiUrl}/opportunities/${id}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    cache: 'no-store',
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error('Failed to load opportunity');
-  return res.json();
+  return apiRead<Opportunity | null>(`/opportunities/${id}`, null, { auth: !!token });
 }
 
 export async function listMyOpportunities(): Promise<Opportunity[]> {
-  const token = await getAccessToken();
-  if (!token) return [];
-  const res = await fetch(`${config.apiUrl}/opportunities/mine`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to load your opportunities');
-  return res.json();
+  return apiRead<Opportunity[]>('/opportunities/mine', [], { auth: true });
 }

@@ -1,27 +1,20 @@
 import 'server-only';
-import { config } from '@/lib/config';
-import { getAccessToken } from '@/lib/session';
+import { apiRead } from '@/lib/api-client';
 import type { Mandate, MatchResult } from './types';
 
-async function authedGet<T>(path: string): Promise<T> {
-  const token = await getAccessToken();
-  if (!token) throw new Error('Not authenticated');
-  const res = await fetch(`${config.apiUrl}${path}`, {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error(`Request failed (${res.status})`);
-  return res.json();
-}
-
 export function listMyMandates(): Promise<Mandate[]> {
-  return authedGet<Mandate[]>('/mandates/mine');
+  return apiRead<Mandate[]>('/mandates/mine', [], { auth: true });
 }
 
-export function getMandate(id: string): Promise<Mandate> {
-  return authedGet<Mandate>(`/mandates/${id}`);
+/** null when it does not exist, is not yours, or the API is unreachable. */
+export function getMandate(id: string): Promise<Mandate | null> {
+  return apiRead<Mandate | null>(`/mandates/${id}`, null, { auth: true });
 }
 
 export function getMandateMatches(id: string): Promise<MatchResult> {
-  return authedGet<MatchResult>(`/mandates/${id}/matches`);
+  return apiRead<MatchResult>(
+    `/mandates/${id}/matches`,
+    { mandateId: id, count: 0, matches: [] },
+    { auth: true },
+  );
 }

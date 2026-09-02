@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { UsersModule } from './modules/users/users.module';
 import { OpportunitiesModule } from './modules/opportunities/opportunities.module';
 import { ReferenceModule } from './modules/reference/reference.module';
@@ -67,5 +69,6 @@ import { ClarificationsModule } from './modules/clarifications/clarifications.mo
     MatchingModule,
     MandatesModule,
   ],
+  providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
 export class AppModule {}

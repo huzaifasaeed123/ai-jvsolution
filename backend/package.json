@@ -19,7 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node prisma/seed/index.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "build:seed": "tsc prisma/seed/index.ts --outDir dist-seed --module commonjs --target es2021 --esModuleInterop --skipLibCheck --resolveJsonModule",
+    "seed:prod": "node dist-seed/index.js"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

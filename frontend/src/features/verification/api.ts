@@ -1,4 +1,5 @@
 import 'server-only';
+import { apiRead } from '@/lib/api-client';
 import { config } from '@/lib/config';
 import { getAccessToken } from '@/lib/session';
 import type { Passport, VerificationReference } from './types';
@@ -14,7 +15,11 @@ export async function getVerification(opportunityId: string): Promise<Passport |
 }
 
 export async function getVerificationReference(): Promise<VerificationReference> {
-  const res = await fetch(`${config.apiUrl}/reference/verification`, { next: { revalidate: 3600 } });
-  if (!res.ok) throw new Error('Failed to load verification reference');
-  return res.json();
+  // Reference lists only supply labels; empty means codes show raw, which is
+  // far better than the passport panel taking the whole page down.
+  return apiRead<VerificationReference>(
+    '/reference/verification',
+    { tiers: [], verifiableFields: [] },
+    { revalidate: 3600 },
+  );
 }
