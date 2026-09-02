@@ -32,7 +32,17 @@ export interface ReadOptions {
   revalidate?: number;
   /** Escape hatch for callers that need a specific cache mode. */
   cache?: RequestCache;
+  /** Milliseconds before the read is abandoned. */
+  timeoutMs?: number;
 }
+
+/**
+ * An API that hangs is worse than one that refuses: a refused connection fails
+ * in milliseconds, while a hung one holds the render until something upstream
+ * gives up, pinning a server worker the whole time. A few slow requests can
+ * therefore take out a page that has nothing to do with them.
+ */
+const DEFAULT_TIMEOUT_MS = 10_000;
 
 /** True when the failure is worth an operator's attention, rather than a 404. */
 function isNoteworthy(status: number | null): boolean {
@@ -72,7 +82,7 @@ export async function apiRead<T>(
   fallback: T,
   options: ReadOptions = {},
 ): Promise<T> {
-  const { auth = false, revalidate, cache } = options;
+  const { auth = false, revalidate, cache, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
 
   let token: string | undefined;
   if (auth) {
@@ -84,6 +94,7 @@ export async function apiRead<T>(
 
   const init: RequestInit & { next?: { revalidate: number } } = {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
+    signal: AbortSignal.timeout(timeoutMs),
   };
   if (revalidate !== undefined) init.next = { revalidate };
   else init.cache = cache ?? 'no-store';
@@ -105,7 +116,12 @@ export async function apiRead<T>(
     return JSON.parse(text) as T;
   } catch (err) {
     if (isFrameworkSignal(err)) throw err;
-    logFailure(path, status, err instanceof Error ? err.message : String(err));
+    const timedOut = err instanceof Error && err.name === 'TimeoutError';
+    logFailure(
+      path,
+      status,
+      timedOut ? `timed out after ${timeoutMs}ms` : err instanceof Error ? err.message : String(err),
+    );
     return fallback;
   }
 }
