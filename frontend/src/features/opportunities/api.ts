@@ -12,12 +12,32 @@ import type {
  * detail passes the owner's token so confidential fields are revealed to them.
  */
 
+/**
+ * Reference lists for dropdowns and label maps. This one used to throw, which
+ * fails `next build` whenever the API is unreachable — including the first
+ * deploy, before the API exists. Empty lists degrade to raw codes on screen,
+ * which is survivable; a failed build is not.
+ */
 export async function getOpportunityReference(): Promise<OpportunityReference> {
-  const res = await fetch(`${config.apiUrl}/reference/opportunities`, {
-    next: { revalidate: 3600 },
-  });
-  if (!res.ok) throw new Error('Failed to load reference data');
-  return res.json();
+  const empty: OpportunityReference = {
+    sectors: [],
+    projectTypes: [],
+    structures: [],
+    ownerCategories: [],
+    riskLevels: [],
+    permitStatuses: [],
+    dataRoomReadiness: [],
+    verificationTiers: [],
+  };
+  try {
+    const res = await fetch(`${config.apiUrl}/reference/opportunities`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return empty;
+    return (await res.json()) as OpportunityReference;
+  } catch {
+    return empty;
+  }
 }
 
 export async function listOpportunities(

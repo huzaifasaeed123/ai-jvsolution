@@ -23,7 +23,14 @@ export interface PublicStats {
  * landing page without hitting the DB on every request.
  */
 export async function getPublicStats(): Promise<PublicStats | null> {
-  const res = await fetch(`${config.apiUrl}/stats/public`, { next: { revalidate: 300 } });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetch(`${config.apiUrl}/stats/public`, { next: { revalidate: 300 } });
+    if (!res.ok) return null;
+    return (await res.json()) as PublicStats;
+  } catch {
+    // Reached during `next build` too, when the API may not be up yet. The
+    // landing page already renders without figures, so degrade rather than
+    // fail the build.
+    return null;
+  }
 }
