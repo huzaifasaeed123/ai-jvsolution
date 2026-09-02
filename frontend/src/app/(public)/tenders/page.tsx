@@ -1,8 +1,9 @@
 import Link from 'next/link';
-import { listPublicTenders } from '@/features/tenders/api';
+import { listPublicTendersResult } from '@/features/tenders/api';
 import { TenderCard } from '@/features/tenders/components/TenderCard';
 import { COUNTRIES } from '@/features/auth/constants';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { EmptyState, LoadFailed } from '@/components/ui/DataState';
 
 export const metadata = {
   title: 'Tender notices',
@@ -18,7 +19,8 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const country = typeof sp.countryCode === 'string' ? sp.countryCode : undefined;
 
-  const tenders = await listPublicTenders({ countryCode: country });
+  const read = await listPublicTendersResult({ countryCode: country });
+  const tenders = read.data;
   const open = tenders.filter((t) => OPEN_STAGES.includes(t.stage) && !t.deadlinePassed);
   const closed = tenders.filter((t) => !OPEN_STAGES.includes(t.stage) || t.deadlinePassed);
 
@@ -53,12 +55,16 @@ export default async function TendersPage({ searchParams }: { searchParams: Prom
         </div>
       )}
 
-      {tenders.length === 0 ? (
-        <div className="mt-10 rounded-[var(--radius-card)] border border-dashed border-border-strong px-6 py-16 text-center">
-          <p className="display text-lg">No tender notices published yet</p>
-          <p className="mt-1 text-sm text-muted">
-            Government and semi-government authorities publish procurement here.
-          </p>
+      {!read.ok ? (
+        <div className="mt-8">
+          <LoadFailed what="tender notices" />
+        </div>
+      ) : tenders.length === 0 ? (
+        <div className="mt-8">
+          <EmptyState
+            title="No tender notices published yet"
+            body="Government and semi-government authorities publish procurement here."
+          />
         </div>
       ) : (
         <>

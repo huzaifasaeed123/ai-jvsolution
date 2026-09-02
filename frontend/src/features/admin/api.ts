@@ -1,6 +1,7 @@
 import 'server-only';
 import { config } from '@/lib/config';
 import { getAccessToken } from '@/lib/session';
+import { apiReadResult } from '@/lib/api-client';
 import type {
   AdminOverview,
   AdminUser,
@@ -56,6 +57,19 @@ export function getGrowth() {
 
 export function listUsers(params: Record<string, string | undefined>) {
   return get<Paged<AdminUser>>(`/admin/users${qs(params)}`, EMPTY<AdminUser>());
+}
+
+/**
+ * As listUsers, but says whether the read worked. An operator shown "no
+ * accounts" during an outage would reasonably conclude the directory had been
+ * wiped, so this distinction matters more here than almost anywhere.
+ */
+export async function listUsersResult(params: Record<string, string | undefined>) {
+  return apiReadResult<Paged<AdminUser>>(
+    `/admin/users${qs(params)}`,
+    EMPTY<AdminUser>(),
+    { auth: true },
+  );
 }
 
 export function getUser(id: string) {

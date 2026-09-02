@@ -1,5 +1,5 @@
 import 'server-only';
-import { apiRead } from '@/lib/api-client';
+import { apiRead, apiReadResult } from '@/lib/api-client';
 import { getAccessToken } from '@/lib/session';
 import type {
   Opportunity,
@@ -34,6 +34,14 @@ export async function getOpportunityReference(): Promise<OpportunityReference> {
   });
 }
 
+const EMPTY_LIST: OpportunityListResult = {
+  items: [],
+  total: 0,
+  page: 1,
+  limit: 0,
+  pages: 1,
+};
+
 export async function listOpportunities(
   searchParams: Record<string, string | undefined>,
 ): Promise<OpportunityListResult> {
@@ -41,13 +49,24 @@ export async function listOpportunities(
   for (const [k, v] of Object.entries(searchParams)) {
     if (v) qs.set(k, v);
   }
-  return apiRead<OpportunityListResult>(`/opportunities?${qs.toString()}`, {
-    items: [],
-    total: 0,
-    page: 1,
-    limit: 0,
-    pages: 1,
-  });
+  return apiRead<OpportunityListResult>(`/opportunities?${qs.toString()}`, EMPTY_LIST);
+}
+
+/**
+ * As listOpportunities, but reports whether the read succeeded so the page can
+ * distinguish an empty market from an unreachable API.
+ */
+export async function listOpportunitiesResult(
+  searchParams: Record<string, string | undefined>,
+) {
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(searchParams)) {
+    if (v) qs.set(k, v);
+  }
+  return apiReadResult<OpportunityListResult>(
+    `/opportunities?${qs.toString()}`,
+    EMPTY_LIST,
+  );
 }
 
 /**

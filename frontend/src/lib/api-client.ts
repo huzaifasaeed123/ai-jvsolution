@@ -71,6 +71,32 @@ function isFrameworkSignal(err: unknown): boolean {
   return (err as { name?: string }).name === 'DynamicServerError';
 }
 
+/** A read that also reports whether it actually succeeded. */
+export interface ReadResult<T> {
+  data: T;
+  /** false when the fallback is being returned because the read failed. */
+  ok: boolean;
+  status: number | null;
+}
+
+/**
+ * GET `path`, reporting success alongside the data.
+ *
+ * Degrading to a fallback keeps a page alive, but it also makes a failure look
+ * exactly like genuinely empty data — a listing page would say "no results"
+ * when the API is simply unreachable, which is worse than an error because the
+ * visitor believes it and never retries. Any page whose empty state could be
+ * mistaken for a failure should read through this and say which it is.
+ */
+export async function apiReadResult<T>(
+  path: string,
+  fallback: T,
+  options: ReadOptions = {},
+): Promise<ReadResult<T>> {
+  const outcome = await read(path, fallback, options);
+  return outcome;
+}
+
 /**
  * GET `path`, or return `fallback` if anything at all goes wrong.
  *
@@ -82,6 +108,15 @@ export async function apiRead<T>(
   fallback: T,
   options: ReadOptions = {},
 ): Promise<T> {
+  const { data } = await read(path, fallback, options);
+  return data;
+}
+
+async function read<T>(
+  path: string,
+  fallback: T,
+  options: ReadOptions = {},
+): Promise<ReadResult<T>> {
   const { auth = false, revalidate, cache, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
 
   let token: string | undefined;
@@ -89,7 +124,7 @@ export async function apiRead<T>(
     token = await getAccessToken();
     // An unauthenticated read is not an error — the caller's fallback already
     // describes what an anonymous visitor should see.
-    if (!token) return fallback;
+    if (!token) return { data: fallback, ok: true, status: null };
   }
 
   const init: RequestInit & { next?: { revalidate: number } } = {
@@ -105,15 +140,15 @@ export async function apiRead<T>(
     status = res.status;
     if (!res.ok) {
       logFailure(path, status, res.statusText);
-      return fallback;
+      return { data: fallback, ok: false, status };
     }
 
     // A 200 with no body is legitimate on some endpoints (a tender with no
     // Swiss Challenge, for instance). res.json() would reject on it.
     const text = await res.text();
-    if (!text) return fallback;
+    if (!text) return { data: fallback, ok: true, status };
 
-    return JSON.parse(text) as T;
+    return { data: JSON.parse(text) as T, ok: true, status };
   } catch (err) {
     if (isFrameworkSignal(err)) throw err;
     const timedOut = err instanceof Error && err.name === 'TimeoutError';
@@ -122,7 +157,7 @@ export async function apiRead<T>(
       status,
       timedOut ? `timed out after ${timeoutMs}ms` : err instanceof Error ? err.message : String(err),
     );
-    return fallback;
+    return { data: fallback, ok: false, status };
   }
 }
 

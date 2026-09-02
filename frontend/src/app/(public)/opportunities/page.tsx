@@ -1,9 +1,10 @@
 import Link from 'next/link';
-import { listOpportunities, getOpportunityReference } from '@/features/opportunities/api';
+import { listOpportunitiesResult, getOpportunityReference } from '@/features/opportunities/api';
 import { OpportunityCard } from '@/features/opportunities/components/OpportunityCard';
 import { OpportunityFilters } from '@/features/opportunities/components/OpportunityFilters';
 import { toLabelMap } from '@/features/opportunities/format';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { EmptyState, LoadFailed } from '@/components/ui/DataState';
 
 export const metadata = { title: 'Opportunities' };
 
@@ -21,10 +22,11 @@ export default async function OpportunitiesPage({
   searchParams: Promise<SP>;
 }) {
   const sp = flat(await searchParams);
-  const [reference, result] = await Promise.all([
+  const [reference, read] = await Promise.all([
     getOpportunityReference(),
-    listOpportunities(sp),
+    listOpportunitiesResult(sp),
   ]);
+  const result = read.data;
   const sectorLabels = toLabelMap(reference.sectors);
   const page = result.page;
 
@@ -51,13 +53,17 @@ export default async function OpportunitiesPage({
         />
       </div>
 
-      {result.items.length === 0 ? (
-        <div className="mt-10 rounded-[var(--radius-card)] border border-dashed border-border-strong px-6 py-16 text-center">
-          <p className="display text-lg">Nothing matches those filters</p>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-muted">
-            Try widening the sector, owner type or risk level — or clear the filters to see the
-            whole market.
-          </p>
+      {!read.ok ? (
+        // A failed read must not be dressed up as an empty market.
+        <div className="mt-8">
+          <LoadFailed what="opportunities" />
+        </div>
+      ) : result.items.length === 0 ? (
+        <div className="mt-8">
+          <EmptyState
+            title="Nothing matches those filters"
+            body="Try widening the sector, owner type or risk level — or clear the filters to see the whole market."
+          />
         </div>
       ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

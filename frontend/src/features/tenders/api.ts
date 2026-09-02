@@ -1,6 +1,7 @@
 import 'server-only';
 import { config } from '@/lib/config';
 import { getAccessToken } from '@/lib/session';
+import { apiReadResult } from '@/lib/api-client';
 import type {
   Tender,
   Addendum,
@@ -29,6 +30,17 @@ async function get<T>(path: string, fallback: T, cache: RequestCache = 'no-store
   } catch {
     return fallback;
   }
+}
+
+/** As listPublicTenders, but reports whether the read actually succeeded. */
+export async function listPublicTendersResult(
+  params: { countryCode?: string; stage?: string } = {},
+) {
+  const qs = new URLSearchParams();
+  if (params.countryCode) qs.set('countryCode', params.countryCode);
+  if (params.stage) qs.set('stage', params.stage);
+  const suffix = qs.toString() ? `?${qs}` : '';
+  return apiReadResult<Tender[]>(`/tenders${suffix}`, []);
 }
 
 export function listPublicTenders(params: { countryCode?: string; stage?: string } = {}) {

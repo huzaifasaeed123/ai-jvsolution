@@ -1,10 +1,11 @@
-import { listUsers } from '@/features/admin/api';
+import { listUsersResult } from '@/features/admin/api';
 import { getCurrentUser } from '@/lib/session';
 import { Avatar } from '@/components/ui/Media';
 import { Badge } from '@/components/ui/Badge';
 import { AdminFilters } from '@/features/admin/components/AdminFilters';
 import { UserActions } from '@/features/admin/components/UserActions';
 import { Pager } from '@/features/admin/components/Pager';
+import { EmptyState, LoadFailed } from '@/components/ui/DataState';
 import { ROLE_LABEL, ACCESS_LABEL, StatusPill, relative } from '@/features/admin/format';
 
 export const metadata = { title: 'Users · Back office' };
@@ -19,7 +20,8 @@ function flat(sp: SP): Record<string, string | undefined> {
 
 export default async function AdminUsersPage({ searchParams }: { searchParams: Promise<SP> }) {
   const sp = flat(await searchParams);
-  const [result, me] = await Promise.all([listUsers(sp), getCurrentUser()]);
+  const [read, me] = await Promise.all([listUsersResult(sp), getCurrentUser()]);
+  const result = read.data;
 
   return (
     <div>
@@ -51,10 +53,16 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
         ]}
       />
 
-      {result.items.length === 0 ? (
-        <div className="mt-6 rounded-[var(--radius-card)] border border-dashed border-border-strong px-6 py-14 text-center">
-          <p className="display text-lg">No accounts match those filters</p>
-          <p className="mt-1.5 text-sm text-muted">Clear the filters to see the whole directory.</p>
+      {!read.ok ? (
+        <div className="mt-6">
+          <LoadFailed what="the user directory" />
+        </div>
+      ) : result.items.length === 0 ? (
+        <div className="mt-6">
+          <EmptyState
+            title="No accounts match those filters"
+            body="Clear the filters to see the whole directory."
+          />
         </div>
       ) : (
         <div className="mt-5 space-y-3">
