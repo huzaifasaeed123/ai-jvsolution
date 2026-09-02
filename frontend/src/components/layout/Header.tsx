@@ -34,7 +34,7 @@ export async function Header() {
               {config.brandName}
             </span>
             <span className="block text-[10px] uppercase tracking-[0.11em] text-muted">
-              JV · PPP · Concessions
+              {t('nav.tagline')}
             </span>
           </span>
         </Link>

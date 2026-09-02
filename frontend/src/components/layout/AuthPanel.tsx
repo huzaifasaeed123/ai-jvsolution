@@ -1,6 +1,9 @@
 import { getPublicStats } from '@/features/stats/api';
 import { config } from '@/lib/config';
+import { getTranslator } from '@/i18n/server';
 
+/** Kept in English: these are specific product claims, not chrome, and a
+ *  mistranslation here would misstate what the platform actually guarantees. */
 const PROOF = [
   {
     title: 'Nothing confidential leaves the server early',
@@ -31,7 +34,7 @@ function compact(n: number, currency: string) {
  * where the form should have the whole screen rather than competing with it.
  */
 export async function AuthPanel() {
-  const stats = await getPublicStats();
+  const [stats, t] = await Promise.all([getPublicStats(), getTranslator()]);
 
   return (
     <aside className="relative hidden overflow-hidden bg-primary text-primary-foreground lg:block">
@@ -52,14 +55,11 @@ export async function AuthPanel() {
       <div className="relative flex h-full flex-col justify-center px-10 py-16 xl:px-16">
         <div className="max-w-md">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent">
-            Joint ventures · PPP · Concessions
+            {t('home.eyebrow')}
           </p>
-          <h2 className="display mt-4 text-[2rem] leading-[1.12]">
-            One deal room for both sides of a venture
-          </h2>
+          <h2 className="display mt-4 text-[2rem] leading-[1.12]">{t('auth.panelTitle')}</h2>
           <p className="mt-4 text-sm leading-relaxed opacity-75">
-            {config.brandName} connects landowners, governments and asset holders with the
-            developers, investors and contractors who can deliver — under controlled disclosure.
+            {config.brandName} {t('auth.panelBody')}
           </p>
 
           <ul className="mt-10 space-y-6">
@@ -76,7 +76,7 @@ export async function AuthPanel() {
               <div>
                 <p className="figure text-2xl leading-none">{stats.publishedOpportunities}</p>
                 <p className="mt-1.5 text-[10px] uppercase tracking-[0.1em] opacity-60">
-                  Live opportunities
+                  {t('home.statsOpportunities')}
                 </p>
               </div>
               <div>
@@ -84,13 +84,13 @@ export async function AuthPanel() {
                   {compact(stats.totalProjectValue, stats.totalProjectValueCurrency)}
                 </p>
                 <p className="mt-1.5 text-[10px] uppercase tracking-[0.1em] opacity-60">
-                  Value listed
+                  {t('home.statsValue')}
                 </p>
               </div>
               <div>
                 <p className="figure text-2xl leading-none">{stats.marketsCovered}</p>
                 <p className="mt-1.5 text-[10px] uppercase tracking-[0.1em] opacity-60">
-                  Markets
+                  {t('home.statsMarkets')}
                 </p>
               </div>
             </div>

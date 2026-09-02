@@ -3,6 +3,7 @@
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { useTranslator } from '@/i18n/client';
 
 /**
  * The two states a list can be in when it has nothing to show, and why they
@@ -39,6 +40,7 @@ export function EmptyState({
  */
 export function LoadFailed({ what }: { what: string }) {
   const router = useRouter();
+  const t = useTranslator();
   const [pending, start] = useTransition();
 
   return (
@@ -46,17 +48,14 @@ export function LoadFailed({ what }: { what: string }) {
       role="alert"
       className="rounded-[var(--radius-card)] border border-danger/30 bg-danger/[0.06] px-6 py-12 text-center"
     >
-      <p className="display text-lg text-danger">Could not load {what}</p>
-      <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-        This is usually temporary. Nothing has been lost — the data could not be
-        reached just now.
-      </p>
+      <p className="display text-lg text-danger">{t('error.loadFailed', { what })}</p>
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t('error.loadFailedBody')}</p>
       <button
         onClick={() => start(() => router.refresh())}
         disabled={pending}
         className="btn btn-outline mt-5 px-4 py-2 text-sm"
       >
-        {pending ? 'Retrying…' : 'Try again'}
+        {pending ? t('common.retrying') : t('common.tryAgain')}
       </button>
     </div>
   );

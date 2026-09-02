@@ -6,9 +6,11 @@ import Link from 'next/link';
 import { authApi } from '@/features/auth/api';
 import { ROLE_OPTIONS, COUNTRIES } from '@/features/auth/constants';
 import type { Role } from '@/features/auth/types';
+import { useTranslator } from '@/i18n/client';
 
 function RegisterForm() {
   const router = useRouter();
+  const t = useTranslator();
   const params = useSearchParams();
   const initialRole = (params.get('role') as Role) ?? 'OWNER';
 
@@ -39,11 +41,9 @@ function RegisterForm() {
 
   return (
     <>
-      <p className="eyebrow">Create account</p>
-      <h1 className="display mt-2 text-[1.875rem] leading-tight">Join the platform</h1>
-      <p className="mt-2 text-sm text-muted">
-        One account, whichever side of the venture you sit on.
-      </p>
+      <p className="eyebrow">{t('auth.registerEyebrow')}</p>
+      <h1 className="display mt-2 text-[1.875rem] leading-tight">{t('auth.joinTitle')}</h1>
+      <p className="mt-2 text-sm text-muted">{t('auth.joinLede')}</p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
         {error && (
@@ -56,7 +56,7 @@ function RegisterForm() {
         )}
 
         <fieldset>
-          <legend className="mb-2 text-sm font-medium">I am joining as</legend>
+          <legend className="mb-2 text-sm font-medium">{t('auth.joiningAs')}</legend>
           <div className="grid grid-cols-2 gap-2">
             {ROLE_OPTIONS.map((opt) => {
               const selected = role === opt.value;
@@ -88,7 +88,7 @@ function RegisterForm() {
 
         <div>
           <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium">
-            Full name
+            {t('auth.fullName')}
           </label>
           <input
             id="fullName"
@@ -102,7 +102,7 @@ function RegisterForm() {
 
         <div>
           <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
-            Email
+            {t('auth.email')}
           </label>
           <input
             id="email"
@@ -117,7 +117,7 @@ function RegisterForm() {
 
         <div>
           <label htmlFor="password" className="mb-1.5 block text-sm font-medium">
-            Password
+            {t('auth.password')}
           </label>
           <input
             id="password"
@@ -129,12 +129,12 @@ function RegisterForm() {
             onChange={(e) => setPassword(e.target.value)}
             className="input"
           />
-          <p className="mt-1.5 text-xs text-muted">Minimum 8 characters.</p>
+          <p className="mt-1.5 text-xs text-muted">{t('auth.minChars')}</p>
         </div>
 
         <div>
           <label htmlFor="country" className="mb-1.5 block text-sm font-medium">
-            Country
+            {t('auth.country')}
           </label>
           <select
             id="country"
@@ -142,7 +142,7 @@ function RegisterForm() {
             onChange={(e) => setCountry(e.target.value)}
             className="input"
           >
-            <option value="">Select a country…</option>
+            <option value="">{t('auth.selectCountry')}</option>
             {COUNTRIES.map((c) => (
               <option key={c.code} value={c.code}>
                 {c.name}
@@ -152,14 +152,14 @@ function RegisterForm() {
         </div>
 
         <button type="submit" disabled={loading} className="btn btn-primary w-full py-2.5">
-          {loading ? 'Creating account…' : 'Create account'}
+          {loading ? t('auth.creatingAccount') : t('auth.createAccountBtn')}
         </button>
       </form>
 
       <p className="mt-8 border-t border-border pt-6 text-sm text-muted">
-        Already have an account?{' '}
+        {t('auth.haveAccount')}{' '}
         <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
-          Sign in
+          {t('nav.signIn')}
         </Link>
       </p>
     </>

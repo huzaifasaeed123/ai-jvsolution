@@ -5,6 +5,8 @@ import { listCountries } from "@/features/countries/api";
 import { listOpportunities, getOpportunityReference } from "@/features/opportunities/api";
 import { CoverImage } from "@/components/ui/Media";
 import { formatMoney, toLabelMap, OWNER_CATEGORY_LABEL } from "@/features/opportunities/format";
+import { getTranslator } from "@/i18n/server";
+import type { MessageKey } from "@/i18n/messages";
 import {
   IconBuilding,
   IconTarget,
@@ -14,49 +16,20 @@ import {
   IconKey,
 } from "@/components/ui/icons";
 
-const CAPABILITIES = [
-  {
-    icon: <IconSpark />,
-    title: "Explainable Fit Score",
-    desc: "Two-sided matching that scores every opportunity–mandate pair and shows which factors earned the points. No black box.",
-  },
-  {
-    icon: <IconShield />,
-    title: "Anonymous until approved",
-    desc: "Exact location and owner identity stay sealed until the owner approves access and an NDA is signed. Approval alone reveals nothing.",
-  },
-  {
-    icon: <IconKey />,
-    title: "Permission-controlled data room",
-    desc: "A structured vault where every folder carries its own access level and every download is authorised and written to an audit trail.",
-  },
-  {
-    icon: <IconChart />,
-    title: "Feasibility & valuation",
-    desc: "IRR, NPV, payback and break-even, plus valuation by method — each run storing its inputs and assumptions so results reproduce.",
-  },
-  {
-    icon: <IconBuilding />,
-    title: "Opportunity Passport",
-    desc: "A tiered verification record from T0 to T5, showing which facts were checked, by whom, and what remains open.",
-  },
-  {
-    icon: <IconTarget />,
-    title: "Structure recommender",
-    desc: "Ranks JV, PPP and concession formulas against your deal profile, with a stated reason for each placement.",
-  },
+const CAPABILITIES: { icon: React.ReactNode; titleKey: MessageKey; descKey: MessageKey }[] = [
+  { icon: <IconSpark />, titleKey: "home.capFitTitle", descKey: "home.capFitDesc" },
+  { icon: <IconShield />, titleKey: "home.capAnonTitle", descKey: "home.capAnonDesc" },
+  { icon: <IconKey />, titleKey: "home.capRoomTitle", descKey: "home.capRoomDesc" },
+  { icon: <IconChart />, titleKey: "home.capModelTitle", descKey: "home.capModelDesc" },
+  { icon: <IconBuilding />, titleKey: "home.capPassportTitle", descKey: "home.capPassportDesc" },
+  { icon: <IconTarget />, titleKey: "home.capStructureTitle", descKey: "home.capStructureDesc" },
 ];
 
-const OWNER_STEPS = [
-  "List your opportunity privately, in guided steps",
-  "See what it could become — feasibility, valuation and structure options",
-  "Approve who sees it, then compare benchmarked offers side by side",
-];
-
-const CAPITAL_STEPS = [
-  "Define your mandate once — sectors, markets, ticket size, target return",
-  "Receive matched, underwriting-ready opportunities with an explainable score",
-  "Model, request access and submit an offer in one deal room",
+const OWNER_STEP_KEYS: MessageKey[] = ["home.ownerStep1", "home.ownerStep2", "home.ownerStep3"];
+const CAPITAL_STEP_KEYS: MessageKey[] = [
+  "home.capitalStep1",
+  "home.capitalStep2",
+  "home.capitalStep3",
 ];
 
 /** Listings are priced locally, so the API normalises before we format. */
@@ -80,11 +53,12 @@ function Stat({ value, label }: { value: string; label: string }) {
 }
 
 export default async function Home() {
-  const [stats, countries, featured, reference] = await Promise.all([
+  const [stats, countries, featured, reference, t] = await Promise.all([
     getPublicStats(),
     listCountries(),
     listOpportunities({ limit: "3" }),
     getOpportunityReference(),
+    getTranslator(),
   ]);
   const sectorLabels = toLabelMap(reference.sectors);
   const deals = featured.items.slice(0, 3);
@@ -111,16 +85,14 @@ export default async function Home() {
 
         <div className="container-page relative grid items-center gap-12 py-16 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24">
           <div>
-            <p className="eyebrow">Joint ventures · PPP · Concessions</p>
+            <p className="eyebrow">{t("home.eyebrow")}</p>
             <h1 className="display mt-4 text-[2.5rem] leading-[1.05] sm:text-[3.25rem] lg:text-[3.75rem]">
-              Your opportunity.
+              {t("home.title1")}
               <br />
-              <span className="text-primary">Their capital.</span> One venture.
+              <span className="text-primary">{t("home.title2")}</span> {t("home.title3")}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-              {config.brandName} connects landowners, governments and asset holders with
-              developers, investors and contractors — with explainable matching, graded
-              verification and a permission-controlled deal room.
+              {config.brandName} {t("home.lede")}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -128,19 +100,19 @@ export default async function Home() {
                 href="/register?role=OWNER"
                 className="btn btn-primary px-6 py-3 text-base"
               >
-                <IconBuilding width={18} height={18} /> I own land or assets
+                <IconBuilding width={18} height={18} /> {t("home.ctaOwner")}
               </Link>
               <Link
                 href="/register?role=DEVELOPER"
                 className="btn btn-outline px-6 py-3 text-base"
               >
-                <IconTarget width={18} height={18} /> I develop or invest
+                <IconTarget width={18} height={18} /> {t("home.ctaDeveloper")}
               </Link>
             </div>
 
             <p className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-success" />
-              Confidential fields never leave the server until access is granted
+              {t("home.trustLine")}
             </p>
           </div>
 
@@ -164,7 +136,7 @@ export default async function Home() {
                   className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
                 />
                 <span className="absolute left-4 top-4 rounded-md bg-black/45 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-white/90 backdrop-blur-sm">
-                  Live on the platform
+                  {t("home.liveBadge")}
                 </span>
                 <div className="absolute inset-x-0 bottom-0 p-5">
                   <p className="font-mono text-[11px] text-white/70">{hero.reference}</p>
@@ -173,19 +145,25 @@ export default async function Home() {
               </div>
               <div className="grid grid-cols-3 divide-x divide-border">
                 <div className="px-4 py-3">
-                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">GDV</p>
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">
+                    {t("opportunities.gdv")}
+                  </p>
                   <p className="figure mt-0.5 text-sm">
                     {formatMoney(hero.projectValue, hero.currency)}
                   </p>
                 </div>
                 <div className="px-4 py-3">
-                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">Investment</p>
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">
+                    {t("opportunities.investment")}
+                  </p>
                   <p className="figure mt-0.5 text-sm">
                     {formatMoney(hero.investmentRequired, hero.currency)}
                   </p>
                 </div>
                 <div className="px-4 py-3">
-                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">Target IRR</p>
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted">
+                    {t("opportunities.targetIrr")}
+                  </p>
                   <p className="figure mt-0.5 text-sm">
                     {hero.targetIrr ? `${hero.targetIrr}%` : "—"}
                   </p>
@@ -201,18 +179,21 @@ export default async function Home() {
         <section className="border-b border-border bg-surface">
           <div className="container-page py-8 sm:py-10">
             <div className="grid grid-cols-2 divide-x divide-y divide-border border border-border sm:grid-cols-4 sm:divide-y-0">
-              <Stat value={String(stats.publishedOpportunities)} label="Live opportunities" />
+              <Stat
+                value={String(stats.publishedOpportunities)}
+                label={t("home.statsOpportunities")}
+              />
               <Stat
                 value={compactMoney(stats.totalProjectValue, stats.totalProjectValueCurrency)}
-                label={`Value listed · ${stats.totalProjectValueCurrency} eq.`}
+                label={`${t("home.statsValue")} · ${stats.totalProjectValueCurrency} eq.`}
               />
-              <Stat value={String(stats.verifiedOpportunities)} label="Verified listings" />
-              <Stat value={String(stats.marketsCovered)} label="Markets covered" />
+              <Stat value={String(stats.verifiedOpportunities)} label={t("home.statsVerified")} />
+              <Stat value={String(stats.marketsCovered)} label={t("home.statsMarkets")} />
             </div>
             <p className="mt-4 text-xs text-muted">
-              Counted live from the platform · {stats.structuresSupported} partnership structures
-              supported · {stats.activeMandates} active{" "}
-              {stats.activeMandates === 1 ? "mandate" : "mandates"}
+              {t("home.statsFootnote")} · {stats.structuresSupported} {t("home.statsStructures")}{" "}
+              · {stats.activeMandates}{" "}
+              {stats.activeMandates === 1 ? t("home.statsMandate") : t("home.statsMandates")}
             </p>
           </div>
         </section>
@@ -223,14 +204,14 @@ export default async function Home() {
         <section className="container-page py-16 sm:py-20">
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
             <div>
-              <p className="eyebrow">Open now</p>
-              <h2 className="display mt-2 text-2xl sm:text-3xl">Currently seeking partners</h2>
+              <p className="eyebrow">{t("home.dealsEyebrow")}</p>
+              <h2 className="display mt-2 text-2xl sm:text-3xl">{t("home.dealsTitle")}</h2>
             </div>
             <Link
               href="/opportunities"
               className="text-sm font-medium text-primary underline-offset-4 hover:underline"
             >
-              Browse all opportunities →
+              {t("home.dealsBrowseAll")} →
             </Link>
           </div>
 
@@ -265,7 +246,7 @@ export default async function Home() {
                   {o.city ? ` · ${o.city}` : ""} · {o.countryCode}
                 </p>
                 <p className="mt-3 border-t border-border pt-3 text-sm">
-                  <span className="text-muted">Investment </span>
+                  <span className="text-muted">{t("opportunities.investment")} </span>
                   <span className="figure">
                     {formatMoney(o.investmentRequired, o.currency)}
                   </span>
@@ -285,26 +266,24 @@ export default async function Home() {
       {/* ================= TWO SIDES ================= */}
       <section className="border-y border-border bg-surface">
         <div className="container-page py-16 sm:py-20">
-          <p className="eyebrow">Two sides, one deal room</p>
-          <h2 className="display mt-2 max-w-2xl text-2xl sm:text-3xl">
-            Whichever side of the table you sit on
-          </h2>
+          <p className="eyebrow">{t("home.sidesEyebrow")}</p>
+          <h2 className="display mt-2 max-w-2xl text-2xl sm:text-3xl">{t("home.sidesTitle")}</h2>
 
           <div className="mt-10 grid gap-8 md:grid-cols-2 md:gap-10">
             {[
               {
                 icon: <IconBuilding />,
                 tint: "bg-primary/10 text-primary",
-                title: "For owners & authorities",
-                steps: OWNER_STEPS,
-                cta: { href: "/register?role=OWNER", label: "List an opportunity" },
+                title: t("home.ownersTitle"),
+                steps: OWNER_STEP_KEYS.map((k) => t(k)),
+                cta: { href: "/register?role=OWNER", label: t("home.ownerCta") },
               },
               {
                 icon: <IconTarget />,
                 tint: "bg-accent/15 text-accent",
-                title: "For developers & investors",
-                steps: CAPITAL_STEPS,
-                cta: { href: "/register?role=DEVELOPER", label: "Define a mandate" },
+                title: t("home.capitalTitle"),
+                steps: CAPITAL_STEP_KEYS.map((k) => t(k)),
+                cta: { href: "/register?role=DEVELOPER", label: t("home.capitalCta") },
               },
             ].map((side) => (
               <div key={side.title} className="flex flex-col">
@@ -344,17 +323,17 @@ export default async function Home() {
 
       {/* ================= CAPABILITIES ================= */}
       <section className="container-page py-16 sm:py-20">
-        <p className="eyebrow">Built for institutional trust</p>
+        <p className="eyebrow">{t("home.capabilitiesEyebrow")}</p>
         <h2 className="display mt-2 max-w-2xl text-2xl sm:text-3xl">
-          Every number the platform produces can be explained
+          {t("home.capabilitiesTitle")}
         </h2>
 
         <div className="mt-10 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((f) => (
-            <div key={f.title} className="border-t border-border pt-5">
+            <div key={f.titleKey} className="border-t border-border pt-5">
               <span className="text-primary">{f.icon}</span>
-              <h3 className="mt-3 text-base font-semibold">{f.title}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">{f.desc}</p>
+              <h3 className="mt-3 text-base font-semibold">{t(f.titleKey)}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">{t(f.descKey)}</p>
             </div>
           ))}
         </div>
@@ -366,16 +345,14 @@ export default async function Home() {
           <div className="container-page py-16 sm:py-20">
             <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
               <div>
-                <p className="eyebrow">Market intelligence</p>
-                <h2 className="display mt-2 text-2xl sm:text-3xl">
-                  How partnerships work, market by market
-                </h2>
+                <p className="eyebrow">{t("home.marketsEyebrow")}</p>
+                <h2 className="display mt-2 text-2xl sm:text-3xl">{t("home.marketsTitle")}</h2>
               </div>
               <Link
                 href="/countries"
                 className="text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
-                All {countries.length} markets →
+                {t("home.marketsAll", { count: countries.length })} →
               </Link>
             </div>
 
@@ -392,7 +369,8 @@ export default async function Home() {
                       {c.name}
                     </span>
                     <span className="block font-mono text-[11px] text-muted">
-                      {c.ownerShareRange.low}–{c.ownerShareRange.high}% owner share
+                      {c.ownerShareRange.low}–{c.ownerShareRange.high}%{" "}
+                      {t("home.marketsOwnerShare")}
                     </span>
                   </span>
                 </Link>
@@ -406,17 +384,16 @@ export default async function Home() {
       <section className="border-t border-border bg-primary text-primary-foreground">
         <div className="container-page flex flex-col items-start justify-between gap-6 py-14 sm:flex-row sm:items-center sm:py-16">
           <div>
-            <h2 className="display text-2xl sm:text-[1.75rem]">Ready to find your partner?</h2>
+            <h2 className="display text-2xl sm:text-[1.75rem]">{t("home.finalTitle")}</h2>
             <p className="mt-2 max-w-lg text-sm leading-relaxed opacity-80">
-              Create an account and list an opportunity or define a mandate. Your confidential
-              details stay sealed until you decide otherwise.
+              {t("home.finalBody")}
             </p>
           </div>
           <Link
             href="/register"
             className="btn shrink-0 bg-[var(--primary-foreground)] px-6 py-3 text-base text-[var(--primary)] hover:opacity-90"
           >
-            Create your account
+            {t("common.createAccount")}
           </Link>
         </div>
       </section>

@@ -19,10 +19,22 @@ export async function getLocale(): Promise<Locale> {
   return DEFAULT_LOCALE;
 }
 
-/** Translator for server components: `const t = await getTranslator()`. */
+/** Replace `{token}` placeholders — the only interpolation these catalogs need. */
+function interpolate(template: string, vars?: Record<string, string | number>): string {
+  if (!vars) return template;
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    key in vars ? String(vars[key]) : match,
+  );
+}
+
+/**
+ * Translator for server components: `const t = await getTranslator()`.
+ * `t('home.marketsAll', { count: 12 })` fills `{count}` in the string.
+ */
 export async function getTranslator() {
   const locale = await getLocale();
   const messages = getMessages(locale);
-  const t = (key: MessageKey) => messages[key];
+  const t = (key: MessageKey, vars?: Record<string, string | number>) =>
+    interpolate(messages[key], vars);
   return Object.assign(t, { locale, dir: directionOf(locale), locales: LOCALES });
 }

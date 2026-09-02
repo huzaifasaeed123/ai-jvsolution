@@ -1,32 +1,37 @@
 import Link from 'next/link';
 import { config } from '@/lib/config';
 import { listCountries } from '@/features/countries/api';
+import { getTranslator } from '@/i18n/server';
+import type { MessageKey } from '@/i18n/messages';
 
-const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
+const COLUMNS: {
+  titleKey: MessageKey;
+  links: { href: string; labelKey: MessageKey }[];
+}[] = [
   {
-    title: 'Platform',
+    titleKey: 'footer.platform',
     links: [
-      { href: '/opportunities', label: 'Opportunities' },
-      { href: '/tenders', label: 'Tender notices' },
-      { href: '/structures', label: 'Structure library' },
-      { href: '/how-it-works', label: 'How it works' },
+      { href: '/opportunities', labelKey: 'nav.opportunities' },
+      { href: '/tenders', labelKey: 'footer.tenderNotices' },
+      { href: '/structures', labelKey: 'footer.structureLibrary' },
+      { href: '/how-it-works', labelKey: 'nav.howItWorks' },
     ],
   },
   {
-    title: 'Intelligence',
+    titleKey: 'footer.intelligence',
     links: [
-      { href: '/countries', label: 'Country intelligence' },
-      { href: '/structures', label: 'Deal structures explained' },
-      { href: '/how-it-works', label: 'Verification tiers' },
+      { href: '/countries', labelKey: 'nav.countries' },
+      { href: '/structures', labelKey: 'footer.structuresExplained' },
+      { href: '/how-it-works', labelKey: 'footer.verificationTiers' },
     ],
   },
   {
-    title: 'Get started',
+    titleKey: 'footer.getStarted',
     links: [
-      { href: '/register?role=OWNER', label: 'List an opportunity' },
-      { href: '/register?role=DEVELOPER', label: 'Define a mandate' },
-      { href: '/register?role=GOVERNMENT', label: 'Publish a tender' },
-      { href: '/login', label: 'Sign in' },
+      { href: '/register?role=OWNER', labelKey: 'footer.listOpportunity' },
+      { href: '/register?role=DEVELOPER', labelKey: 'footer.defineMandate' },
+      { href: '/register?role=GOVERNMENT', labelKey: 'footer.publishTender' },
+      { href: '/login', labelKey: 'nav.signIn' },
     ],
   },
 ];
@@ -39,7 +44,7 @@ const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
  * needs an anchor.
  */
 export async function Footer() {
-  const countries = await listCountries();
+  const [countries, t] = await Promise.all([listCountries(), getTranslator()]);
 
   return (
     <footer
@@ -75,7 +80,7 @@ export async function Footer() {
                   className="block text-[10px] uppercase tracking-[0.11em]"
                   style={{ color: 'var(--footer-muted)' }}
                 >
-                  JV · PPP · Concessions
+                  {t('nav.tagline')}
                 </span>
               </span>
             </Link>
@@ -84,9 +89,7 @@ export async function Footer() {
               className="mt-5 text-sm leading-relaxed"
               style={{ color: 'var(--footer-muted)' }}
             >
-              A meeting place for landowners, governments and asset holders on one side, and
-              developers, investors and contractors on the other — with explainable matching,
-              graded verification and controlled disclosure between them.
+              {t('footer.blurb')}
             </p>
 
             <p
@@ -94,27 +97,27 @@ export async function Footer() {
               style={{ color: 'var(--footer-muted)' }}
             >
               <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
-              Platform figures are counted live, never hard-coded
+              {t('footer.liveFigures')}
             </p>
           </div>
 
           {COLUMNS.map((col) => (
-            <nav key={col.title} aria-label={col.title}>
+            <nav key={col.titleKey} aria-label={t(col.titleKey)}>
               <p
                 className="text-[10px] font-semibold uppercase tracking-[0.14em]"
                 style={{ color: 'var(--accent)' }}
               >
-                {col.title}
+                {t(col.titleKey)}
               </p>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((l) => (
-                  <li key={l.label}>
+                  <li key={l.labelKey}>
                     <Link
                       href={l.href}
                       className="text-sm underline-offset-4 transition-colors hover:underline"
                       style={{ color: 'var(--footer-muted)' }}
                     >
-                      {l.label}
+                      {t(l.labelKey)}
                     </Link>
                   </li>
                 ))}
@@ -131,7 +134,7 @@ export async function Footer() {
                 className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em]"
                 style={{ color: 'var(--accent)' }}
               >
-                Active markets
+                {t('footer.activeMarkets')}
               </p>
               <span
                 aria-hidden
@@ -142,7 +145,7 @@ export async function Footer() {
                 className="shrink-0 font-mono text-[11px]"
                 style={{ color: 'var(--footer-muted)' }}
               >
-                {countries.length} covered
+                {countries.length} {t('footer.covered')}
               </span>
             </div>
 
@@ -169,11 +172,10 @@ export async function Footer() {
           style={{ borderTop: '1px solid var(--footer-border)', color: 'var(--footer-muted)' }}
         >
           <p>
-            &copy; {new Date().getFullYear()} {config.brandName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {config.brandName}. {t('footer.rights')}
           </p>
           <p className="lg:text-right">
-            Market intelligence and modelling — not legal, tax or investment advice. Verify with
-            qualified local advisors before committing to a structure.
+            {t('footer.disclaimer')}
           </p>
         </div>
       </div>

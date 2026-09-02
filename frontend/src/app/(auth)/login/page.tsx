@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { authApi } from '@/features/auth/api';
+import { useTranslator } from '@/i18n/client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslator();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,11 +31,9 @@ export default function LoginPage() {
 
   return (
     <>
-      <p className="eyebrow">Sign in</p>
-      <h1 className="display mt-2 text-[1.875rem] leading-tight">Welcome back</h1>
-      <p className="mt-2 text-sm text-muted">
-        Pick up where you left off — your opportunities, mandates and deal rooms.
-      </p>
+      <p className="eyebrow">{t('auth.signInEyebrow')}</p>
+      <h1 className="display mt-2 text-[1.875rem] leading-tight">{t('auth.welcomeBack')}</h1>
+      <p className="mt-2 text-sm text-muted">{t('auth.signInLede')}</p>
 
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         {error && (
@@ -47,7 +47,7 @@ export default function LoginPage() {
 
         <div>
           <label htmlFor="email" className="mb-1.5 block text-sm font-medium">
-            Email
+            {t('auth.email')}
           </label>
           <input
             id="email"
@@ -62,7 +62,7 @@ export default function LoginPage() {
 
         <div>
           <label htmlFor="password" className="mb-1.5 block text-sm font-medium">
-            Password
+            {t('auth.password')}
           </label>
           <input
             id="password"
@@ -76,17 +76,17 @@ export default function LoginPage() {
         </div>
 
         <button type="submit" disabled={loading} className="btn btn-primary w-full py-2.5">
-          {loading ? 'Signing in…' : 'Sign in'}
+          {loading ? t('auth.signingIn') : t('nav.signIn')}
         </button>
       </form>
 
       <p className="mt-8 border-t border-border pt-6 text-sm text-muted">
-        New here?{' '}
+        {t('auth.newHere')}{' '}
         <Link
           href="/register"
           className="font-medium text-primary underline-offset-4 hover:underline"
         >
-          Create an account
+          {t('auth.createAccountLink')}
         </Link>
       </p>
     </>
