@@ -12,6 +12,7 @@ describe('configuration: google redirect URI', () => {
 
   beforeEach(() => {
     process.env = { ...original };
+    delete process.env.NEXT_PUBLIC_SITE_URL;
     delete process.env.SITE_URL;
     delete process.env.GOOGLE_REDIRECT_URI;
     delete process.env.GOOGLE_CLIENT_ID;
@@ -26,14 +27,14 @@ describe('configuration: google redirect URI', () => {
     process.env.NODE_ENV = 'production';
     process.env.GOOGLE_CLIENT_ID = 'id';
     process.env.GOOGLE_CLIENT_SECRET = 'secret';
-    expect(() => configuration()).toThrow(/SITE_URL/);
+    expect(() => configuration()).toThrow(/NEXT_PUBLIC_SITE_URL/);
   });
 
   it('refuses to start in production when the origin is localhost', () => {
     process.env.NODE_ENV = 'production';
     process.env.GOOGLE_CLIENT_ID = 'id';
     process.env.GOOGLE_CLIENT_SECRET = 'secret';
-    process.env.SITE_URL = 'http://localhost:3000';
+    process.env.NEXT_PUBLIC_SITE_URL = 'http://localhost:3000';
     expect(() => configuration()).toThrow(/localhost/i);
   });
 
@@ -41,7 +42,7 @@ describe('configuration: google redirect URI', () => {
     process.env.NODE_ENV = 'production';
     process.env.GOOGLE_CLIENT_ID = 'id';
     process.env.GOOGLE_CLIENT_SECRET = 'secret';
-    process.env.SITE_URL = 'http://127.0.0.1:3000';
+    process.env.NEXT_PUBLIC_SITE_URL = 'http://127.0.0.1:3000';
     expect(() => configuration()).toThrow(/localhost/i);
   });
 
@@ -49,7 +50,7 @@ describe('configuration: google redirect URI', () => {
     process.env.NODE_ENV = 'production';
     process.env.GOOGLE_CLIENT_ID = 'id';
     process.env.GOOGLE_CLIENT_SECRET = 'secret';
-    process.env.SITE_URL = 'https://ai-jvsolution.online';
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://ai-jvsolution.online';
     const c = configuration();
     expect(c.google.redirectUri).toBe(
       'https://ai-jvsolution.online/api/auth/callback/google',
@@ -70,6 +71,27 @@ describe('configuration: google redirect URI', () => {
     process.env.GOOGLE_CLIENT_SECRET = 'secret';
     expect(configuration().google.redirectUri).toBe(
       'http://localhost:3000/api/auth/callback/google',
+    );
+  });
+
+  it('still accepts a bare SITE_URL as an alias', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.GOOGLE_CLIENT_ID = 'id';
+    process.env.GOOGLE_CLIENT_SECRET = 'secret';
+    process.env.SITE_URL = 'https://ai-jvsolution.online';
+    expect(configuration().google.redirectUri).toBe(
+      'https://ai-jvsolution.online/api/auth/callback/google',
+    );
+  });
+
+  it('prefers NEXT_PUBLIC_SITE_URL when both are set', () => {
+    process.env.NODE_ENV = 'production';
+    process.env.GOOGLE_CLIENT_ID = 'id';
+    process.env.GOOGLE_CLIENT_SECRET = 'secret';
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://ai-jvsolution.online';
+    process.env.SITE_URL = 'https://stale.example';
+    expect(configuration().google.redirectUri).toBe(
+      'https://ai-jvsolution.online/api/auth/callback/google',
     );
   });
 

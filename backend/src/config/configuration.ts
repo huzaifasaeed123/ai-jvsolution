@@ -57,12 +57,20 @@ export default (): AppConfig => ({
     const clientId = process.env.GOOGLE_CLIENT_ID ?? '';
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? '';
 
-    // The origin the browser is actually on. Outside development there is no
-    // sane default for this — guessing localhost is how a production deploy
-    // ends up telling Google to send people to a machine that is not the
-    // server, which fails in a way that looks like a Google problem rather
-    // than a missing environment variable.
-    const siteUrl = process.env.SITE_URL ?? (isProd ? '' : 'http://localhost:3000');
+    // The origin the browser is actually on. NEXT_PUBLIC_SITE_URL is the name
+    // this project already uses for it — same value, set once, read by both
+    // apps — so Google sign-in reads that rather than introducing a second
+    // variable meaning the same thing. SITE_URL stays accepted as an alias for
+    // deployments that already set it.
+    //
+    // Outside development there is no sane default: guessing localhost is how
+    // a production deploy ends up telling Google to send people to a machine
+    // that is not the server, and the failure then looks like a Google problem
+    // rather than a missing environment variable.
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      process.env.SITE_URL ??
+      (isProd ? '' : 'http://localhost:3000');
 
     // Path must match the Google console byte for byte; Google compares the
     // redirect URI as an exact string, not by route equivalence.
@@ -76,8 +84,9 @@ export default (): AppConfig => ({
       // Fail loudly at boot rather than serving a broken button. A silent
       // fallback here costs an hour of debugging Google's error page.
       throw new Error(
-        'Google sign-in has credentials but no callback URL. Set SITE_URL ' +
-          '(e.g. https://your-domain.com) or GOOGLE_REDIRECT_URI.',
+        'Google sign-in has credentials but no callback URL. Set ' +
+          'NEXT_PUBLIC_SITE_URL (e.g. https://your-domain.com) on this service, ' +
+          'or GOOGLE_REDIRECT_URI to override it.',
       );
     }
     // Never let a localhost callback reach a production deployment: Google
@@ -86,7 +95,7 @@ export default (): AppConfig => ({
     if (isProd && /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(redirectUri)) {
       throw new Error(
         `Refusing to start: Google redirect URI points at localhost (${redirectUri}) ` +
-          'in production. Set SITE_URL to the public origin.',
+          'in production. Set NEXT_PUBLIC_SITE_URL to the public origin.',
       );
     }
 
