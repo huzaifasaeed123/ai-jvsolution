@@ -52,22 +52,51 @@ export default (): AppConfig => ({
     provider: process.env.AI_PROVIDER ?? 'template',
   },
   google: (() => {
+    const nodeEnv = process.env.NODE_ENV ?? 'development';
+    const isProd = nodeEnv === 'production';
     const clientId = process.env.GOOGLE_CLIENT_ID ?? '';
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? '';
+
+    // The origin the browser is actually on. Outside development there is no
+    // sane default for this — guessing localhost is how a production deploy
+    // ends up telling Google to send people to a machine that is not the
+    // server, which fails in a way that looks like a Google problem rather
+    // than a missing environment variable.
+    const siteUrl = process.env.SITE_URL ?? (isProd ? '' : 'http://localhost:3000');
+
+    // Path must match the Google console byte for byte; Google compares the
+    // redirect URI as an exact string, not by route equivalence.
+    const redirectUri =
+      process.env.GOOGLE_REDIRECT_URI ??
+      (siteUrl ? `${siteUrl}/api/auth/callback/google` : '');
+
+    const configured = Boolean(clientId && clientSecret && redirectUri);
+
+    if (isProd && clientId && clientSecret && !redirectUri) {
+      // Fail loudly at boot rather than serving a broken button. A silent
+      // fallback here costs an hour of debugging Google's error page.
+      throw new Error(
+        'Google sign-in has credentials but no callback URL. Set SITE_URL ' +
+          '(e.g. https://your-domain.com) or GOOGLE_REDIRECT_URI.',
+      );
+    }
+    // Never let a localhost callback reach a production deployment: Google
+    // would send a real user to their own machine, and the sign-in silently
+    // fails for everyone but the developer.
+    if (isProd && /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(redirectUri)) {
+      throw new Error(
+        `Refusing to start: Google redirect URI points at localhost (${redirectUri}) ` +
+          'in production. Set SITE_URL to the public origin.',
+      );
+    }
+
     return {
       clientId,
       clientSecret,
-      // Defaults to the site origin so a deploy only has to set SITE_URL. The
-      // path is /api/auth/callback/google to match what is registered in the
-      // Google console — Google compares the redirect URI as an exact string,
-      // so /api/auth/google/callback would be rejected even though it reaches
-      // the same handler.
-      redirectUri:
-        process.env.GOOGLE_REDIRECT_URI ??
-        `${process.env.SITE_URL ?? 'http://localhost:3000'}/api/auth/callback/google`,
+      redirectUri,
       // A button that cannot work is worse than no button, so the frontend
       // asks for this and renders nothing when it is false.
-      enabled: Boolean(clientId && clientSecret),
+      enabled: configured,
     };
   })(),
 });
