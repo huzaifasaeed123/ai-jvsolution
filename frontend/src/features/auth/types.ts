@@ -16,6 +16,8 @@ export interface User {
   accessLevel: AccessLevel;
   country: string | null;
   avatarUrl: string | null;
+  /** False while a Google-created account still has to choose its role. */
+  roleConfirmed: boolean;
   companyId: string | null;
   createdAt: string;
   updatedAt: string;

@@ -257,6 +257,20 @@ export const en = {
   'dash.newOpportunity': 'New opportunity',
   'dash.newMandate': 'New mandate',
   'dash.newTender': 'New tender',
+
+  // ------------------------------------------------------- google sign-in
+  'auth.continueWithGoogle': 'Continue with Google',
+  'auth.googleRedirecting': 'Redirecting to Google…',
+  'auth.or': 'or',
+  'auth.googleFailed': 'Google sign-in could not be completed. Please try again.',
+  'auth.googleCancelled': 'Google sign-in was cancelled.',
+  'auth.googleState': 'That sign-in link has expired. Please try again.',
+  'onboarding.eyebrow': 'One more step',
+  'onboarding.title': 'How will you use the platform?',
+  'onboarding.lede':
+    'This decides what you see. You can ask an administrator to change it later.',
+  'onboarding.continue': 'Continue',
+  'onboarding.saving': 'Saving…',
 } as const;
 
 /** Widened to `string` — a translation must be allowed to differ from the

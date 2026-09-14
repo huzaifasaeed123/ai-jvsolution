@@ -26,3 +26,20 @@ export const refreshCookieOptions = {
   path: '/',
   maxAge: 60 * 60 * 24 * 7, // 7d
 };
+
+export const GOOGLE_STATE_COOKIE = 'jv_oauth_state';
+export const GOOGLE_RETURN_COOKIE = 'jv_oauth_next';
+
+/**
+ * For values that only need to survive the redirect to Google and back.
+ * sameSite must be 'lax' rather than 'strict': the callback arrives as a
+ * top-level navigation from accounts.google.com, and a strict cookie would not
+ * be sent on it, breaking the state check we are relying on.
+ */
+export const shortLivedCookie = {
+  httpOnly: true,
+  secure: isProd,
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: 10 * 60,
+};

@@ -221,4 +221,16 @@ export const ur: Partial<Messages> = {
   'dash.newOpportunity': 'نیا موقع',
   'dash.newMandate': 'نیا مینڈیٹ',
   'dash.newTender': 'نیا ٹینڈر',
+
+  'auth.continueWithGoogle': 'Google کے ساتھ جاری رکھیں',
+  'auth.googleRedirecting': 'Google کی طرف بھیجا جا رہا ہے…',
+  'auth.or': 'یا',
+  'auth.googleFailed': 'Google سائن اِن مکمل نہیں ہو سکا۔ براہ کرم دوبارہ کوشش کریں۔',
+  'auth.googleCancelled': 'Google سائن اِن منسوخ کر دیا گیا۔',
+  'auth.googleState': 'سائن اِن لنک کی میعاد ختم ہو گئی۔ براہ کرم دوبارہ کوشش کریں۔',
+  'onboarding.eyebrow': 'ایک اور مرحلہ',
+  'onboarding.title': 'آپ پلیٹ فارم کیسے استعمال کریں گے؟',
+  'onboarding.lede': 'اس سے طے ہوتا ہے کہ آپ کیا دیکھیں گے۔ بعد میں منتظم سے تبدیلی کروا سکتے ہیں۔',
+  'onboarding.continue': 'جاری رکھیں',
+  'onboarding.saving': 'محفوظ کیا جا رہا ہے…',
 };

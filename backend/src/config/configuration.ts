@@ -20,6 +20,14 @@ export interface AppConfig {
   ai: {
     provider: string;
   };
+  google: {
+    clientId: string;
+    clientSecret: string;
+    /** Where Google sends the browser back. Must match the console exactly. */
+    redirectUri: string;
+    /** False when the credentials are absent — the UI hides the button. */
+    enabled: boolean;
+  };
 }
 
 export default (): AppConfig => ({
@@ -43,4 +51,20 @@ export default (): AppConfig => ({
   ai: {
     provider: process.env.AI_PROVIDER ?? 'template',
   },
+  google: (() => {
+    const clientId = process.env.GOOGLE_CLIENT_ID ?? '';
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? '';
+    return {
+      clientId,
+      clientSecret,
+      // Defaults to the site origin so a deploy only has to set SITE_URL, but
+      // the value still has to be registered in the Google console verbatim.
+      redirectUri:
+        process.env.GOOGLE_REDIRECT_URI ??
+        `${process.env.SITE_URL ?? 'http://localhost:3000'}/api/auth/google/callback`,
+      // A button that cannot work is worse than no button, so the frontend
+      // asks for this and renders nothing when it is false.
+      enabled: Boolean(clientId && clientSecret),
+    };
+  })(),
 });

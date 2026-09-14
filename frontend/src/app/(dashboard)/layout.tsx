@@ -12,6 +12,10 @@ import { config } from '@/lib/config';
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
+  // A Google account that has not picked a role yet gets sent to onboarding.
+  // Enforced here rather than only on the redirect after sign-in, so typing
+  // the URL directly does not skip the question.
+  if (!user.roleConfirmed) redirect('/onboarding');
 
   return (
     <div className="flex min-h-screen">

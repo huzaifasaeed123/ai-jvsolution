@@ -237,4 +237,16 @@ export const zh: Partial<Messages> = {
   'dash.newOpportunity': '新建合作机会',
   'dash.newMandate': '新建委托',
   'dash.newTender': '新建招标',
+
+  'auth.continueWithGoogle': '使用 Google 继续',
+  'auth.googleRedirecting': '正在跳转至 Google…',
+  'auth.or': '或',
+  'auth.googleFailed': 'Google 登录未能完成，请重试。',
+  'auth.googleCancelled': 'Google 登录已取消。',
+  'auth.googleState': '该登录链接已失效，请重试。',
+  'onboarding.eyebrow': '还有一步',
+  'onboarding.title': '您将如何使用本平台？',
+  'onboarding.lede': '这将决定您看到的内容。之后可请管理员更改。',
+  'onboarding.continue': '继续',
+  'onboarding.saving': '正在保存…',
 };

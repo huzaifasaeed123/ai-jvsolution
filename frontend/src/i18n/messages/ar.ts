@@ -229,4 +229,16 @@ export const ar: Partial<Messages> = {
   'dash.newOpportunity': 'فرصة جديدة',
   'dash.newMandate': 'تفويض جديد',
   'dash.newTender': 'مناقصة جديدة',
+
+  'auth.continueWithGoogle': 'المتابعة باستخدام Google',
+  'auth.googleRedirecting': 'جارٍ التحويل إلى Google…',
+  'auth.or': 'أو',
+  'auth.googleFailed': 'تعذّر إكمال تسجيل الدخول عبر Google. يرجى المحاولة مرة أخرى.',
+  'auth.googleCancelled': 'تم إلغاء تسجيل الدخول عبر Google.',
+  'auth.googleState': 'انتهت صلاحية رابط تسجيل الدخول. يرجى المحاولة مرة أخرى.',
+  'onboarding.eyebrow': 'خطوة أخيرة',
+  'onboarding.title': 'كيف ستستخدم المنصة؟',
+  'onboarding.lede': 'هذا يحدد ما تراه. يمكنك أن تطلب من المسؤول تغييره لاحقًا.',
+  'onboarding.continue': 'متابعة',
+  'onboarding.saving': 'جارٍ الحفظ…',
 };

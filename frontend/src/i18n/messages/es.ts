@@ -237,4 +237,17 @@ export const es: Partial<Messages> = {
   'dash.newOpportunity': 'Nueva oportunidad',
   'dash.newMandate': 'Nuevo mandato',
   'dash.newTender': 'Nueva licitación',
+
+  'auth.continueWithGoogle': 'Continuar con Google',
+  'auth.googleRedirecting': 'Redirigiendo a Google…',
+  'auth.or': 'o',
+  'auth.googleFailed': 'No se pudo completar el inicio de sesión con Google. Inténtelo de nuevo.',
+  'auth.googleCancelled': 'Se canceló el inicio de sesión con Google.',
+  'auth.googleState': 'Ese enlace de inicio de sesión ha caducado. Inténtelo de nuevo.',
+  'onboarding.eyebrow': 'Un paso más',
+  'onboarding.title': '¿Cómo usará la plataforma?',
+  'onboarding.lede':
+    'Esto determina lo que verá. Puede pedir a un administrador que lo cambie más adelante.',
+  'onboarding.continue': 'Continuar',
+  'onboarding.saving': 'Guardando…',
 };

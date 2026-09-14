@@ -5,6 +5,7 @@ import * as argon2 from 'argon2';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { UsersRepository } from '../users/users.repository';
+import { GoogleAuthService } from './google.service';
 import { Role, AccessLevel, User, UserStatus } from '@prisma/client';
 
 /** Minimal fake user row. */
@@ -18,6 +19,8 @@ function makeUser(overrides: Partial<User> = {}): User {
     accessLevel: AccessLevel.REGISTERED,
     country: 'AE',
     avatarUrl: null,
+    googleId: null,
+    roleConfirmed: true,
     status: UserStatus.ACTIVE,
     suspendedAt: null,
     suspendedReason: null,
@@ -48,11 +51,15 @@ describe('AuthService', () => {
     // Login stamps lastLoginAt through the repository and builds the result
     // from the row it returns, so the fake echoes the user back.
     usersRepo = { update: jest.fn().mockImplementation((id: string) => makeUser({ id })) };
+    // Google is not exercised by these tests; a stub keeps the constructor happy
+    // without pulling network code into a unit test.
+    const google = { enabled: false } as unknown as GoogleAuthService;
     service = new AuthService(
       users as unknown as UsersService,
       usersRepo as unknown as UsersRepository,
       jwt,
       config,
+      google,
     );
   });
 

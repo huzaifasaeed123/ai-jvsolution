@@ -22,6 +22,8 @@ function makeUser(over: Partial<User> = {}): User {
     accessLevel: AccessLevel.REGISTERED,
     country: 'AE',
     avatarUrl: null,
+    googleId: null,
+    roleConfirmed: true,
     status: UserStatus.ACTIVE,
     suspendedAt: null,
     suspendedReason: null,

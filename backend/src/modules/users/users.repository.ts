@@ -15,6 +15,11 @@ export class UsersRepository {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
+  /** Google's subject claim is the stable identifier, unlike an email address. */
+  findByGoogleId(googleId: string): Promise<User | null> {
+    return this.prisma.user.findUnique({ where: { googleId } });
+  }
+
   create(data: Prisma.UserCreateInput): Promise<User> {
     return this.prisma.user.create({ data });
   }

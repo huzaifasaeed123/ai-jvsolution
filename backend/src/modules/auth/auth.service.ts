@@ -6,6 +6,7 @@ import * as argon2 from 'argon2';
 import { UsersService, SafeUser } from '../users/users.service';
 import { UsersRepository } from '../users/users.repository';
 import { RegisterDto } from './dto/register.dto';
+import { GoogleAuthService, GoogleProfile } from './google.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './jwt.strategy';
 
@@ -22,7 +23,68 @@ export class AuthService {
     private readonly usersRepo: UsersRepository,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly google: GoogleAuthService,
   ) {}
+
+  /**
+   * Handles issued by the Google callback, held only until the frontend
+   * redeems them. In memory on purpose: they live for seconds, are single-use,
+   * and putting them in Postgres would mean a write on every sign-in for data
+   * that is worthless a moment later. A multi-instance deployment would need
+   * Redis here — noted rather than pretended away.
+   */
+  private readonly pendingGrants = new Map<
+    string,
+    { result: AuthResult; isNew: boolean; expiresAt: number }
+  >();
+
+  /** Complete the Google round trip and stash the tokens behind a handle. */
+  async googleCallback(code: string): Promise<{ handle: string; isNew: boolean }> {
+    const profile: GoogleProfile = await this.google.fetchProfile(code);
+    const { user, isNew } = await this.google.resolveUser(profile);
+    const result = await this.buildResult(user);
+
+    this.sweepExpiredGrants();
+    const { handle, hash } = GoogleAuthService.newHandle();
+    this.pendingGrants.set(hash, { result, isNew, expiresAt: Date.now() + 120_000 });
+    return { handle, isNew };
+  }
+
+  /** Redeem a handle exactly once, server to server. */
+  redeemGoogleGrant(handle: string): AuthResult & { isNew: boolean } {
+    const hash = GoogleAuthService.hashHandle(handle);
+    const grant = this.pendingGrants.get(hash);
+    this.pendingGrants.delete(hash); // single use, whether or not it was valid
+    if (!grant || grant.expiresAt < Date.now()) {
+      throw new UnauthorizedException('This sign-in link has expired. Please try again.');
+    }
+    return { ...grant.result, isNew: grant.isNew };
+  }
+
+  /**
+   * Onboarding: a Google user picking Owner / Developer / Investor / Government.
+   * Only callable while the role is still unconfirmed, so it cannot be used
+   * later as a self-service privilege change.
+   */
+  async confirmRole(userId: string, role: Role): Promise<SafeUser> {
+    if (role === Role.ADMIN) {
+      throw new ForbiddenException('This role cannot be self-assigned');
+    }
+    const user = await this.users.findById(userId);
+    if (!user || user.deletedAt) throw new UnauthorizedException('User no longer exists');
+    if (user.roleConfirmed) {
+      throw new ForbiddenException('Your role has already been set');
+    }
+    const updated = await this.usersRepo.update(userId, { role, roleConfirmed: true });
+    return UsersService.toSafe(updated);
+  }
+
+  private sweepExpiredGrants(): void {
+    const now = Date.now();
+    for (const [k, v] of this.pendingGrants) {
+      if (v.expiresAt < now) this.pendingGrants.delete(k);
+    }
+  }
 
   async register(dto: RegisterDto): Promise<AuthResult> {
     // Admin accounts are never self-registerable (privilege-escalation guard).
@@ -47,6 +109,12 @@ export class AuthService {
   async login(dto: LoginDto): Promise<AuthResult> {
     const user = await this.users.findByEmail(dto.email.toLowerCase());
     if (!user) throw new UnauthorizedException('Invalid email or password');
+
+    // An account created through Google has no password. Saying so would turn
+    // this endpoint into an account-enumeration oracle — anyone could discover
+    // which addresses are registered, and which of those use Google. It fails
+    // exactly like a wrong password instead.
+    if (!user.passwordHash) throw new UnauthorizedException('Invalid email or password');
 
     const valid = await argon2.verify(user.passwordHash, dto.password);
     if (!valid) throw new UnauthorizedException('Invalid email or password');

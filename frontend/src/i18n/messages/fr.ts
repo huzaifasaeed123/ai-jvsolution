@@ -237,4 +237,17 @@ export const fr: Partial<Messages> = {
   'dash.newOpportunity': 'Nouvelle opportunité',
   'dash.newMandate': 'Nouveau mandat',
   'dash.newTender': "Nouvel appel d'offres",
+
+  'auth.continueWithGoogle': 'Continuer avec Google',
+  'auth.googleRedirecting': 'Redirection vers Google…',
+  'auth.or': 'ou',
+  'auth.googleFailed': "La connexion Google n'a pas pu aboutir. Veuillez réessayer.",
+  'auth.googleCancelled': 'La connexion Google a été annulée.',
+  'auth.googleState': 'Ce lien de connexion a expiré. Veuillez réessayer.',
+  'onboarding.eyebrow': 'Encore une étape',
+  'onboarding.title': 'Comment allez-vous utiliser la plateforme ?',
+  'onboarding.lede':
+    "Cela détermine ce que vous voyez. Un administrateur pourra le modifier plus tard.",
+  'onboarding.continue': 'Continuer',
+  'onboarding.saving': 'Enregistrement…',
 };

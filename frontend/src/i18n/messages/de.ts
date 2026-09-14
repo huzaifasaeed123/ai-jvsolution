@@ -237,4 +237,17 @@ export const de: Partial<Messages> = {
   'dash.newOpportunity': 'Neue Gelegenheit',
   'dash.newMandate': 'Neues Mandat',
   'dash.newTender': 'Neue Ausschreibung',
+
+  'auth.continueWithGoogle': 'Mit Google fortfahren',
+  'auth.googleRedirecting': 'Weiterleitung zu Google…',
+  'auth.or': 'oder',
+  'auth.googleFailed': 'Die Google-Anmeldung konnte nicht abgeschlossen werden. Bitte erneut versuchen.',
+  'auth.googleCancelled': 'Die Google-Anmeldung wurde abgebrochen.',
+  'auth.googleState': 'Dieser Anmeldelink ist abgelaufen. Bitte erneut versuchen.',
+  'onboarding.eyebrow': 'Noch ein Schritt',
+  'onboarding.title': 'Wie werden Sie die Plattform nutzen?',
+  'onboarding.lede':
+    'Das bestimmt, was Sie sehen. Ein Administrator kann es später ändern.',
+  'onboarding.continue': 'Weiter',
+  'onboarding.saving': 'Wird gespeichert…',
 };

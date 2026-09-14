@@ -208,13 +208,25 @@ model Company {
 model User {
   id           String        @id @default(cuid())
   email        String        @unique
-  passwordHash String
+  /// Null for accounts created through an identity provider, which never had a
+  /// password to hash. The password sign-in path must treat that as a normal
+  /// failed login rather than revealing that the account exists.
+  passwordHash String?
   fullName     String
   role         Role
+  /// False until a Google-created user has picked their role in onboarding.
+  /// Role itself stays non-null so every guard and serializer keeps working;
+  /// this flag is what the dashboard checks before letting them in.
+  roleConfirmed Boolean      @default(true)
   accessLevel  AccessLevel   @default(REGISTERED)
   country      String?
   /// Public profile image. External URL in dev/demo; object-storage key in prod.
   avatarUrl    String?
+
+  // --- Federated identity ---
+  /// Google's stable subject claim. Matched on before email, because an email
+  /// address can change hands while the subject never does.
+  googleId     String?       @unique
 
   // --- Account lifecycle & moderation (admin back-office) ---
   status          UserStatus @default(ACTIVE)
